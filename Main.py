@@ -568,32 +568,65 @@ def main():
 
     wantGrayImage = False  #If false gets a colored image
     oldimage = getImageArray(selectedImagePath,wantGrayImage)
+    oldimagecopy = oldimage.copy()
     displayImageGivenArray(oldimage)
     Reconstruct(LaplacianPyramids(oldimage,8))
 
-    # def mouse_drawing(event, x, y, flags, params):
-    #     if event == cv2.EVENT_LBUTTONDOWN:
-    #         print("Left click")
-    #         circles.append((x, y))
-    #
+    def mouse_drawing(event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            print("Left click")
+            circles.append((x, y))
+        elif event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:
+            print("MOVING")
+            circles.append((x, y))
+
     # cap = cv2.VideoCapture(0)
-    # cv2.namedWindow("Frame")
-    # cv2.setMouseCallback("Frame", mouse_drawing)
-    #
-    # circles = []
-    #
-    # while True:
-    #     _, oldimage = cap.read()
-    #     for center_position in circles:
-    #         cv2.circle(oldimage, center_position, 5, (0, 0, 255), -1)
-    #     cv2.imshow("Frame", oldimage)
-    #     key = cv2.waitKey(1)
-    #     if key == 27:
-    #         break
-    #     elif key == ord("d"):
-    #         circles = []
+    cv2.namedWindow("Frame")
+    cv2.setMouseCallback("Frame", mouse_drawing)
+
+    circles = []
+
+
+    while True:
+        # _, oldimage = oldimage.read()
+        for center_position in circles:
+            cv2.circle(oldimage, center_position, 2, (0, 0, 255), -1)
+        cv2.imshow("Frame", oldimage)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+        elif key == ord("d"):
+            circles = []
+        elif key == ord("r"):
+            oldimage = oldimagecopy.copy()
+            circles = []
+
+        #np.array(circles).reshape((-1,1,2)).astype(np.int32)
+        try:
+            ''
+            #cv2.drawContours(mask,np.array([circles]),-1,(255,255,0),3)
+        except:
+            ''
+        print("CONNECTING")
     # cap.release()
-    # cv2.destroyAllWindows()
+    print(circles)
+    print(cv2.contourArea(np.array([circles])))
+    #x, y, w, h = cv2.boundingRect(np.array([circles]))
+    # This is simple slicing to get the "Region of Interest"
+   # ROI = oldimagecopy.copy()[y:y + h, x:x + w]
+
+    # create a mask with white pixels
+    mask = np.ones_like(oldimage)
+    mask.fill(255)
+
+    cv2.fillPoly(mask,np.array([circles]),0)
+    newimage = oldimagecopy.copy()
+    masked_image = cv2.bitwise_or(newimage,mask)
+    cv2.namedWindow("Largest Contour", cv2.WINDOW_NORMAL)
+    #cv2.imshow("Largest Contour", ROI)
+    cv2.imshow("Largest Contour", masked_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 main()

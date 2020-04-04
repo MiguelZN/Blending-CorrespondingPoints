@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="534ff38a-2df2-4d3c-ae23-dbeaaa1fef2b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/input_images/screenshot1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -12,13 +10,16 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="CISC442PR1" />
+  </component>
   <component name="FileEditorManager">
     <leaf>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="570" column="4" selection-start-line="570" selection-start-column="4" selection-end-line="570" selection-end-column="4" />
+            <state relative-caret-position="403">
+              <caret line="571" column="4" selection-start-line="571" selection-start-column="4" selection-end-line="571" selection-end-column="4" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -163,8 +164,8 @@
     <frame x="720" y="23" width="720" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.29756796" />
+      <window_info id="Favorites" sideWeight="0.5008347" side_tool="true" visible="true" weight="0.29756796" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.29756796" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -216,8 +217,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="570" column="4" selection-start-line="570" selection-start-column="4" selection-end-line="570" selection-end-column="4" />
+        <state relative-caret-position="403">
+          <caret line="571" column="4" selection-start-line="571" selection-start-column="4" selection-end-line="571" selection-end-column="4" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
