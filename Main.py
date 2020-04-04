@@ -64,6 +64,9 @@ def displayImageGivenPath(imagepath:str, wantGrayImage=False):
     cv2.waitKey(0) #waits for user to type in a key
     cv2.destroyAllWindows()
 
+
+
+
 def displayImageGivenArray(numpyimagearr):
     cv2.imshow('image', numpyimagearr)
     cv2.waitKey(0)  # waits for user to type in a key
@@ -92,14 +95,14 @@ def Convolve(I,H):
 
     if(isinstance(I[0][0],np.uint8)):
         isColorImage = False
-        print("THIS IS A GRAYSCALE IMAGE")
+        #print("THIS IS A GRAYSCALE IMAGE")
     else:
         isColorImage = True
-        print("THIS IS A COLOR IMAGE")
+        #print("THIS IS A COLOR IMAGE")
 
-    print(newimage)
+    #print(newimage)
 
-    print(image_width,image_height)
+    #print(image_width,image_height)
 
     centerOfKernel = -1
 
@@ -110,7 +113,7 @@ def Convolve(I,H):
     middleRow = math.floor(kernel_height/2)
     middleColumn = math.floor(kernel_width/2)
     kernelTotal = np.sum(a=H)
-    print("KERNEL TOTAL:"+str(kernelTotal))
+    #print("KERNEL TOTAL:"+str(kernelTotal))
     #print(middleRow,middleColumn)
 
     if(middleRow==middleColumn):
@@ -263,7 +266,7 @@ by half the width and height of the input. Remember to
 Gaussian filter the image before reducing it; use separable
 1D Gaussian kernels. 
 '''
-def Reduce(I,factor=0.5):
+def Reduce(I,factor:int=0.5):
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
         [2, 4, 2],
@@ -272,99 +275,227 @@ def Reduce(I,factor=0.5):
 
 
     new_image = Convolve(I,GAUSSIAN_KERNEL) #Blurs image using Gaussian Blur kernel
-    new_image = Expand(new_image,factor)#Scales down image
+    new_image = Scale(new_image,factor)#Scales down image
 
+    return new_image
+
+def Scale(I,scaleFactor:int):
+    new_width = int(I.shape[1]*scaleFactor)
+    new_height = int(I.shape[0]*scaleFactor)
+
+    print("NEW WIDTH:"+str(new_width)+",NEW HEIGHT:"+str(new_height))
+
+    new_image = cv2.resize(I, (new_width,new_height))
+    return new_image
+
+def ScaleByGivenDimensions(I,dim):
+    new_image = cv2.resize(I, (dim[0],dim[1]))
     return new_image
 
 '''
 takes image I as input and outputs copy of image expanded,
 twice the width and height of the input. '''
-def Expand(I, scaleFactor):
-    new_width = int(I.shape[1]*scaleFactor)
-    new_height = int(I.shape[0]*scaleFactor)
-    #print("EXPANDING TO WIDTH:"+str(new_width)+", HEIGHT:"+str(new_height))
-    new_image = cv2.resize(I,(new_width,new_height),interpolation=cv2.INTER_NEAREST)
-
-    #print(new_image)
-
-    return new_image
+def Expand(I,otherImage):
+    return ScaleByGivenDimensions(I,(otherImage.shape[1],otherImage.shape[0]))
 
 
 '''
 takes in an image I,
 takes in N (int) is the no. of levels. 
 '''
-def GaussianPyrmaid(I,N):
+def GaussianPyramid(I,N:int):
     curr_image = I
-    for i in range(N):
-        curr_image = Reduce(curr_image)
-        print(curr_image)
-        displayImageGivenArray(curr_image)
+    gaussianpyramid = np.arange(N,dtype=np.ndarray)
+    gaussianpyramid.itemset(0,curr_image)
+
+    #Creates the gaussian blurred images and places them in guassianpryamid variable
+    #Adds N-1 gaussian blurs to the array since first level is the original image
+    for i in range(1,N):
+        try:
+            curr_image = Reduce(curr_image)
+            gaussianpyramid.itemset(i,curr_image)
+            #print(i)
+        except:
+            ''
+            #print("COULD NOT REDUCE FURTHER")
+            #print(i)
+            #gaussianpyramid.itemset(i,np.array([]))
+
+
+    #print(gaussianpyramid)
+    #print(len(gaussianpyramid))
+
+    #Goes through each guassian blurred image and displays it
+    Level = 0
+    for i in gaussianpyramid:
+        print("Level:" + str(Level))
+        try:
+            displayImageGivenArray(i)
+        except:
+            print("Could not display this Guassian Level:"+str(Level)+" image!(perhaps too small?)")
+
+        Level+=1
+
+    return gaussianpyramid
+
+'''
+that produces n level Laplacian pyramid of I.
+'''
+def LaplacianPyramids(I,N:int):
+    print("Starting construction of LaplacianPyramid")
+    GAUSSIAN_KERNEL = np.array([
+        [1, 2, 1],
+        [2, 4, 2],
+        [1, 2, 1]
+    ])
+
+    BIG_GAUSSIAN_KERNEL = np.array([
+        [1,1,1,1,1],
+        [1,2,2,2,1],
+        [1,2,5,2,1],
+        [1,2,2,2,1],
+        [1,1,1,1,1]
+    ])
+
+    listofgaussianimages = []
+    listoflaplacianimages = []
+
+    currentImage = I
+    for i in range(0,N):
+        currentGaussianImage = Convolve(currentImage,GAUSSIAN_KERNEL)
+        listofgaussianimages.append(currentGaussianImage)
+
+        #displayImageGivenArray(currentGaussianImage)
+
+
+        currentLaplacianImage = currentImage-currentGaussianImage
+        listoflaplacianimages.append(currentLaplacianImage)
+        #displayImageGivenArray(currentLaplacianImage)
+
+        currentImage = Reduce(currentImage)
+
+    listoflaplacianimages[len(listoflaplacianimages)-1]=currentImage
+    print("Finished construction of Laplacian Pyramid, press a key to tap through images...")
+
+    p = 0
+    for image in listofgaussianimages:
+        print("Displaying Gaussian Image Level " + str(p) + ":")
+        displayImageGivenArray(image)
+        p+=1
+
+    for i in range(len(listoflaplacianimages)-1,-1,-1):
+        image = listoflaplacianimages[i]
+        print("Displaying Laplacian Image Level "+str(i)+":")
+        displayImageGivenArray(image)
+
+
+    return np.array(listoflaplacianimages)
+
+
+
+    ''
 
 '''
 function which collapses the Laplacian pyramid LI of nlevels 
 to generate the original image. Report the error in reconstruction
 using image difference. 
 '''
-def Reconstruct(Ll,N):
-    return
+def Reconstruct(Ll,N:int = -1):
+    lenLaplacian = len(Ll)
+    if(N ==-1):
+        N = lenLaplacian
+    print("Starting reconstruction, please wait...")
+    originalimage = None
+    GAUSSIAN_KERNEL = np.array([
+        [1, 2, 1],
+        [2, 4, 2],
+        [1, 2, 1]
+    ])
+
+    listofreconstructedimages = np.arange(lenLaplacian,dtype=np.ndarray)
+    currentimage = Ll[lenLaplacian-1]
+    listofreconstructedimages.itemset(lenLaplacian-1,currentimage)
+
+    for i in range(N - 2, -1, -1):
+        currentLaplacianImage = Ll.item(i)
+
+        #Expand first and then blur because expanded image will have irregularities if not blurred
+        currentimage = Convolve(Expand(currentimage,currentLaplacianImage),GAUSSIAN_KERNEL)
+        #currentimage = Expand(currentimage, currentLaplacianImage)
+        currentimage = currentimage+currentLaplacianImage
+        #displayImageGivenArray(currentimage)
+        listofreconstructedimages.itemset(i,currentimage)
+
+    originalimage = currentimage
+    print("Finished reconstruction, press a key to begin displaying images..")
+
+    foundFirstImage = False
+    for i in range(len(listofreconstructedimages)-1,-1,-1):
+        image = listofreconstructedimages.item(i)
+        if(isinstance(image,np.ndarray) and foundFirstImage==False):
+            print("Displaying smallest image at Level "+str(i)+":")
+            foundFirstImage = True
+        elif(isinstance(image,np.ndarray)):
+            print("Displaying reconstructed image Level "+str(i)+":")
+        else:
+            continue
 
 
+        displayImageGivenArray(image)
+
+    return originalimage
+
+
+# refPt = []
+# cropping = False
+# def click_and_crop(image,event,x,y):
+#     # grab references to the global variables
+#     global refPt, cropping
+#     # if the left mouse button was clicked, record the starting
+#     # (x, y) coordinates and indicate that cropping is being
+#     # performed
+#     if event == cv2.EVENT_LBUTTONDOWN:
+#         refPt = [(x, y)]
+#         cropping = True
+#     # check to see if the left mouse button was released
+#     elif event == cv2.EVENT_LBUTTONUP:
+#         # record the ending (x, y) coordinates and indicate that
+#         # the cropping operation is finished
+#         refPt.append((x, y))
+#         cropping = False
+#         # draw a rectangle around the region of interest
+#         cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
+#         cv2.imshow("image", image)
+#         # load the image, clone it, and setup the mouse callback function
+#         clone = image.copy()
+#         cv2.namedWindow("image")
+#         cv2.setMouseCallback("image", click_and_crop)
+#         # keep looping until the 'q' key is pressed
+#         while True:
+#             # display the image and wait for a keypress
+#             cv2.imshow("image", image)
+#             key = cv2.waitKey(1) & 0xFF
+#             # if the 'r' key is pressed, reset the cropping region
+#             if key == ord("r"):
+#                 image = clone.copy()
+#             # if the 'c' key is pressed, break from the loop
+#             elif key == ord("c"):
+#                 break
+#         # if there are two reference points, then crop the region of interest
+#         # from teh image and display it
+#         if len(refPt) == 2:
+#             roi = clone[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+#             cv2.imshow("ROI", roi)
+#             cv2.waitKey(0)
+#         # close all open windows
+#         cv2.destroyAllWindows()
+
+
+
+
+circles = []
 def main():
-
     listOfImages = getAllImagesFromInputImagesDir(IMAGEDIR,True)
-    #print(getAllImagesFromInputImagesDir(IMAGEDIR,True))
-
-    #displayImageGivenPath(listOfImages[0])
-    # displayImageGivenPath(listOfImages[1])
-    # displayImageGivenPath(listOfImages[2])
-
-    # x = np.array([2,3,1,0])
-    #
-    # print(x)
-    # x[2] = 5435
-    # print(len(x))
-    #
-    # t1 = time.time()
-    # yb = range(1000)
-    # for i in yb:
-    #     ''
-    #     #print(x)
-    # print("PYTHON:"+str(time.time()-t1))
-    #
-    # t2 = time.time()
-    # y = np.arange(1000)
-    # for i in np.nditer(y):
-    #     y[i] = 0
-    #     ''
-    # print("NUMPY:"+str(time.time()-t2))
-    #
-    # t3 = time.time()
-    # z = np.arange(1000)
-    # index = 0
-    # for i in z:
-    #     z[index] = 0
-    #     index+=1
-    #     ''
-    # print("NUMPY2:" + str(time.time() - t3))
-    #
-    # print(z)
-    #
-    # for i in x:
-    #     print(i)
-
-    #Loops through each of the new image and
-    # for x in np.nditer(newimage, op_flags=['readwrite']):
-    #     newIntensityValue = 0
-    #
-    #
-    #
-    #
-    #     x[...] = newIntensityValue;
-    #     num_pixels+=1
-
-    #f = np.array([[2,4,43,5],[3,54,35,5]])
-    #print(f.item(1,2))
 
     # Kernels
     MEAN_KERNEL = np.full((3, 3), 1)
@@ -384,6 +515,12 @@ def main():
         [1, 0, -1],
         [2, 0, -2],
         [1, 0, -1]
+    ])
+
+    RAND1 = np.array([
+        [25, 0, 100],
+        [0, -255, 25],
+        [100, 0, 25]
     ])
 
     BIG_GAUSSIAN_KERNEL = np.array([
@@ -426,29 +563,37 @@ def main():
         [0, 1, 1, 1, -10]
     ])
 
-    selectedImagePath = getImageFromListOfImages(listOfImages,'nz1')
+    selectedImagePath = getImageFromListOfImages(listOfImages,'im1')
     print(selectedImagePath)
 
-    wantGrayImage = False
-
+    wantGrayImage = False  #If false gets a colored image
     oldimage = getImageArray(selectedImagePath,wantGrayImage)
-    #oldimage = Expand(Convolve(oldimage,GAUSSIAN_KERNEL),0.5)
     displayImageGivenArray(oldimage)
-    print("HEIGHT:"+str(oldimage.shape[0])+","+"WIDTH:"+str(oldimage.shape[1]))
+    Reconstruct(LaplacianPyramids(oldimage,8))
 
-    newimage = Convolve(oldimage,SHARPEN_IMAGE3)
-    #newimage = Convolve(oldimage,SOBEL_Y)
-    displayImageGivenArray(newimage)
-    print("Finished")
-    #print(newimage)
-    #print(newimage)
+    # def mouse_drawing(event, x, y, flags, params):
+    #     if event == cv2.EVENT_LBUTTONDOWN:
+    #         print("Left click")
+    #         circles.append((x, y))
+    #
+    # cap = cv2.VideoCapture(0)
+    # cv2.namedWindow("Frame")
+    # cv2.setMouseCallback("Frame", mouse_drawing)
+    #
+    # circles = []
+    #
+    # while True:
+    #     _, oldimage = cap.read()
+    #     for center_position in circles:
+    #         cv2.circle(oldimage, center_position, 5, (0, 0, 255), -1)
+    #     cv2.imshow("Frame", oldimage)
+    #     key = cv2.waitKey(1)
+    #     if key == 27:
+    #         break
+    #     elif key == ord("d"):
+    #         circles = []
+    # cap.release()
+    # cv2.destroyAllWindows()
 
-
-
-    #displayImageGivenArray(Expand(newimage,2))
-
-    #displayImageGivenArray(Reduce(oldimage))
-
-    #GaussianPyrmaid(oldimage,5)
 
 main()
