@@ -490,6 +490,85 @@ def Reconstruct(Ll,N:int = -1):
 #         # close all open windows
 #         cv2.destroyAllWindows()
 
+def cropAndBlendGivenImages(listofimagepaths:[str]):
+    circles = []
+    def mouse_drawing(event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            #print("Left click")
+            circles.append((x, y))
+        elif event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:
+            #print("MOVING")
+            circles.append((x, y))
+
+    croppedimages = []
+    imageid = 0
+    for imagepath in listofimagepaths:
+        selectedCropEntireImage = False
+        image = getImageArray(imagepath,False)
+        image_copy = image.copy()
+        print(circles)
+        circles = []
+
+
+
+        while True:
+            imagewithDrawings = image_copy.copy()
+            for center_position in circles:
+                cv2.circle(imagewithDrawings, center_position, 2, (0, 0, 255), -1)
+
+            cv2.namedWindow("Image"+str(imageid))
+            cv2.setMouseCallback("Image"+str(imageid), mouse_drawing)
+            cv2.imshow("Image"+str(imageid), imagewithDrawings)
+            key = cv2.waitKey(1)
+            if key == 27:
+                cv2.destroyAllWindows()
+                return
+            elif key == ord("c"):
+                cv2.destroyAllWindows()
+                break
+            elif key == ord("r"):
+                image_copy = image.copy() #clears out current image from any drawings
+                circles = []
+            elif key == ord("a"):
+                print("Selected entire region")
+                image_copy = image.copy()
+                croppedimages.append(image_copy)
+                selectedCropEntireImage = True
+                cv2.destroyAllWindows()
+                break
+
+        imageid += 1
+        if(selectedCropEntireImage):
+            continue
+        else:
+
+            # create a mask with white pixels
+            mask = np.zeros_like(image_copy)
+            print(mask)
+            mask.fill(0)
+            print(mask)
+
+            cv2.fillPoly(mask, np.array([circles]), (255, 255, 255))
+            print(mask)
+            newimage = image.copy()
+            masked_image = cv2.bitwise_and(mask, image_copy)
+            croppedimages.append(masked_image)
+
+            # x, y, w, h = cv2.boundingRect(np.array([circles]))
+            # This is simple slicing to get the "Region of Interest"
+            # ROI = oldimagecopy.copy()[y:y + h, x:x + w]
+
+            #masked_image = Convolve(masked_image, GAUSSIAN_KERNEL)
+
+    print(imageid)
+    for i in range(len(croppedimages)):
+        cv2.imshow("Cropped Image:"+str(i), croppedimages[i])
+        cv2.waitKey(0)
+
+
+    cv2.destroyAllWindows()
+
+
 
 
 
@@ -572,65 +651,14 @@ def main():
     #displayImageGivenArray(oldimage)
     #Reconstruct(LaplacianPyramids(oldimage,8))
 
-    def mouse_drawing(event, x, y, flags, params):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            print("Left click")
-            circles.append((x, y))
-        elif event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:
-            print("MOVING")
-            circles.append((x, y))
-
-    # cap = cv2.VideoCapture(0)
-    cv2.namedWindow("Frame")
-    cv2.setMouseCallback("Frame", mouse_drawing)
-
-    circles = []
 
 
-    while True:
-        # _, oldimage = oldimage.read()
-        for center_position in circles:
-            cv2.circle(oldimage, center_position, 2, (0, 0, 255), -1)
-        cv2.imshow("Frame", oldimage)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-        elif key == ord("d"):
-            circles = []
-        elif key == ord("r"):
-            oldimage = oldimagecopy.copy()
-            circles = []
+    print("WORKING")
 
-        #np.array(circles).reshape((-1,1,2)).astype(np.int32)
-        try:
-            ''
-            #cv2.drawContours(mask,np.array([circles]),-1,(255,255,0),3)
-        except:
-            ''
-        print("CONNECTING")
-    # cap.release()
-    print(circles)
-    print(cv2.contourArea(np.array([circles])))
-    #x, y, w, h = cv2.boundingRect(np.array([circles]))
-    # This is simple slicing to get the "Region of Interest"
-   # ROI = oldimagecopy.copy()[y:y + h, x:x + w]
 
-    # create a mask with white pixels
-    mask = np.zeros_like(oldimage)
-    print(mask)
-    mask.fill(0)
-    print(mask)
+    cropAndBlendGivenImages(listOfImages[3:7])
 
-    cv2.fillPoly(mask,np.array([circles]),(255,255,255))
-    print(mask)
-    newimage = oldimagecopy.copy()
-    masked_image = cv2.bitwise_and(mask,newimage)
-    masked_image=Convolve(masked_image,GAUSSIAN_KERNEL)
-    cv2.namedWindow("Largest Contour", cv2.WINDOW_NORMAL)
-    #cv2.imshow("Largest Contour", ROI)
-    cv2.imshow("Largest Contour", newimage-masked_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
 
 
 main()
