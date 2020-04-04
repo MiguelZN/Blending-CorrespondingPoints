@@ -569,8 +569,8 @@ def main():
     wantGrayImage = False  #If false gets a colored image
     oldimage = getImageArray(selectedImagePath,wantGrayImage)
     oldimagecopy = oldimage.copy()
-    displayImageGivenArray(oldimage)
-    Reconstruct(LaplacianPyramids(oldimage,8))
+    #displayImageGivenArray(oldimage)
+    #Reconstruct(LaplacianPyramids(oldimage,8))
 
     def mouse_drawing(event, x, y, flags, params):
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -616,15 +616,19 @@ def main():
    # ROI = oldimagecopy.copy()[y:y + h, x:x + w]
 
     # create a mask with white pixels
-    mask = np.ones_like(oldimage)
-    mask.fill(255)
+    mask = np.zeros_like(oldimage)
+    print(mask)
+    mask.fill(0)
+    print(mask)
 
-    cv2.fillPoly(mask,np.array([circles]),0)
+    cv2.fillPoly(mask,np.array([circles]),(255,255,255))
+    print(mask)
     newimage = oldimagecopy.copy()
-    masked_image = cv2.bitwise_or(newimage,mask)
+    masked_image = cv2.bitwise_and(mask,newimage)
+    masked_image=Convolve(masked_image,GAUSSIAN_KERNEL)
     cv2.namedWindow("Largest Contour", cv2.WINDOW_NORMAL)
     #cv2.imshow("Largest Contour", ROI)
-    cv2.imshow("Largest Contour", masked_image)
+    cv2.imshow("Largest Contour", newimage-masked_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
