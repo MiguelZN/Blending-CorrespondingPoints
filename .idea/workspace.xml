@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="864" column="4" selection-start-line="864" selection-start-column="4" selection-end-line="864" selection-end-column="4" />
+            <state relative-caret-position="336">
+              <caret line="635" column="6" lean-forward="true" selection-start-line="635" selection-start-column="6" selection-end-line="635" selection-end-column="6" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -98,6 +98,7 @@
       <find>ScaleBy</find>
       <find>Expand</find>
       <find>LINALG</find>
+      <find>affine</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -111,9 +112,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="704" />
+    <option name="x" value="849" />
     <option name="y" value="23" />
-    <option name="width" value="736" />
+    <option name="width" value="591" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -194,11 +195,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="704" y="23" width="736" height="877" extended-state="0" />
+    <frame x="849" y="23" width="591" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.5008347" side_tool="true" visible="true" weight="0.07972028" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.07972028" />
+      <window_info id="Favorites" sideWeight="0.501634" side_tool="true" visible="true" weight="0.1" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498366" visible="true" weight="0.1" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -206,7 +207,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.23694268" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22038217" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -272,8 +273,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="864" column="4" selection-start-line="864" selection-start-column="4" selection-end-line="864" selection-end-column="4" />
+        <state relative-caret-position="336">
+          <caret line="635" column="6" lean-forward="true" selection-start-line="635" selection-start-column="6" selection-end-line="635" selection-end-column="6" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

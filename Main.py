@@ -571,15 +571,6 @@ def cropAndBlendGivenImages(listofimagepaths:[str]):
 
     print(imageid)
     combinedimage = np.zeros_like(largestimagefound)
-    # for i in range(len(croppedimages)):
-    #     if(croppedimages[i].shape[0]!=combinedimage.shape[0] or croppedimages[i].shape[1]!=combinedimage.shape[1]):
-    #         combinedimage = combinedimage+(Convolve(ScaleByGivenDimensions(croppedimages[i],(combinedimage.shape[1],combinedimage.shape[0])),GAUSSIAN_KERNEL))*.5
-    #     else:
-    #         combinedimage=combinedimage+croppedimages[i]
-    #
-    #     cv2.imshow("Cropped Image:" + str(i), croppedimages[i])
-    #     cv2.waitKey(0)
-    #     cv2.destroyAllWindows()
 
     NLevels=5
     combinedimage = croppedimages[0] #combined image starts with first cropped image
@@ -607,59 +598,93 @@ def cropAndBlendGivenImages(listofimagepaths:[str]):
 
 
 
-def solveForUVUsingTransformParameters(point, m1m2m3m4, txty,p1a,p2a,p3a):
-    image1pointsmatrix = np.array([
-        [p1a[0],p1a[1],1,0,0,0],
-        [0,0,0,p1a[0],p1a[1],1],
-        [p2a[0],p2a[1],1,0,0,0],
-        [0,0,0,p2a[0],p2a[1],1],
-        [p3a[0],p3a[1],1,0,0,0],
-        [0,0,0,p3a[0],p3a[1],1]
+def solveForUVUsingTransformParameters(point,p1a,p2a,p3a,p1b,p2b,p3b):
+    # image1pointsNoTxTyMatrix = np.array([
+    #     [p1a[0],p1a[1],1,0,0,0],
+    #     [0,0,0,p1a[0],p1a[1],1],
+    #     [p2a[0],p2a[1],1,0,0,0],
+    #     [0,0,0,p2a[0],p2a[1],1],
+    #     [p3a[0],p3a[1],1,0,0,0],
+    #     [0,0,0,p3a[0],p3a[1],1]
+    # ])
+
+
+
+    resultPointsMatrix = np.array([
+        [p1b[0]],
+        [p1b[1]],
+        [p2b[0]],
+        [p2b[1]],
+        [p3b[0]],
+        [p3b[1]]
     ])
-    if((isinstance(point,list)==False) and isinstance(point,tuple)==False):
-        raise Exception('ERROR, input a tuple or list representing a x,y point')
-        return
 
-    if(isinstance(point,list) and len(point)>2):
-        raise Exception('ERROR, the length of list is greater than 2!, should be a x,y point')
-        return
+    # print("NEW POINTS:")
+    # print(resultPointsMatrix)
 
-    if ((isinstance(txty, list) == False) and isinstance(txty, tuple) == False):
-        raise Exception('ERROR, input a tuple or list representing a x,y point')
-        return
+    #affineparametersMatrix = np.linalg.inv(image1pointsNoTxTyMatrix)@resultPointsMatrix
+    # print("AFFINE:")
+    # print(affineparametersMatrix)
 
-    if (isinstance(txty, list) and len(txty) > 2):
-        raise Exception('ERROR, the length of list is greater than 2!, should be a x,y point')
-        return
+    image1pointsWithTxTyMatrix = np.array([
+        [p1a[0], p1a[1], 0, 0, 1, 0],
+        [0, 0, p1a[0], p1a[1],0, 1],
+        [p2a[0], p2a[1], 0, 0, 1, 0],
+        [0, 0, p2a[0], p2a[1],0, 1],
+        [p3a[0], p3a[1], 0, 0, 1, 0],
+        [0, 0, p3a[0], p3a[1],0, 1]
+    ])
 
-    if ((isinstance(m1m2m3m4, list) == False) and isinstance(m1m2m3m4, tuple) == False):
-        raise Exception('ERROR, input a tuple or list representing a x,y point')
-        return
+    if((len(image1pointsWithTxTyMatrix)/2)>3):
+        print(len(image1pointsWithTxTyMatrix))
+        print("OVERCONSTRAINED")
+    else:
+        print("NOT OVERCONSTRAINED")
 
-    x = point[0]
-    y = point[1]
+
+    # print("ACTUAL AFFINE:")
+    # actualaffine = cv2.getAffineTransform(np.float32([p1a,p2a,p3a]),np.float32([p1b,p2b,p3b]))
+    # print(actualaffine)
+    # print(actualaffine.shape)
+
+    m1m2m3m4txtyMatrix = np.linalg.inv(image1pointsWithTxTyMatrix)@resultPointsMatrix
+    # print("M1M2M3M4TXTY MATRIX:")
+    # print(m1m2m3m4txtyMatrix)
+    # print(m1m2m3m4txtyMatrix.shape)
+    #
+    # print("FIRST:")
+    # print(m1m2m3m4txtyMatrix[0][0])
+    # print("LAST:")
+    # print(m1m2m3m4txtyMatrix[5][0])
+    # print(m1m2m3m4txtyMatrix[3][0])
+
+    m1m2m3m4_matrix = np.array([
+        [m1m2m3m4txtyMatrix[0][0],m1m2m3m4txtyMatrix[1][0]],
+        [m1m2m3m4txtyMatrix[2][0],m1m2m3m4txtyMatrix[3][0]]
+    ])
+
     xy_matrix = np.array([
-        [x,y,0,0,1,0],
-        [0,0,x,y,0,1]
+        [point[0]],
+        [point[1]]
     ])
 
-    m1 = m1m2m3m4[0]
-    m2 = m1m2m3m4[1]
-    m3 = m1m2m3m4[2]
-    m4 = m1m2m3m4[3]
-    tx = txty[0]
-    ty = txty[1]
-    m1m2m3m4txty_matrix = np.array([
-        [m1],
-        [m2],
-        [m3],
-        [m4],
-        [tx],
-        [ty]
+    txty_matrix = np.array([
+        [m1m2m3m4txtyMatrix[4][0]],
+        [m1m2m3m4txtyMatrix[5][0]]
     ])
 
-    uv_matrix = np.dot(image1pointsmatrix,m1m2m3m4txty_matrix)
-    print(uv_matrix)
+    x = np.linalg.inv(image1pointsWithTxTyMatrix)@resultPointsMatrix
+    # print("X:")
+    # print(x)
+
+    uv_matrix = (m1m2m3m4_matrix@xy_matrix)+txty_matrix
+
+    print("Old Point:[" + str(xy_matrix[0][0]) + "," + str(xy_matrix[1][0]) + "]")
+
+    print("New Point:["+str(uv_matrix[0][0])+","+str(uv_matrix[1][0])+"]")
+
+
+
     return uv_matrix
 
 
@@ -783,172 +808,37 @@ def main():
                        'img2_x': 150.06069632822084, 'img2_y': 202.48516922296875}]
     print(selectedPoints)
 
-    p1a = np.float32([selectedPoints[0]['img1_x'],selectedPoints[0]['img1_y']])
-    p1b = np.float32([selectedPoints[0]['img2_x'],selectedPoints[0]['img2_y']])
+    p1a = [selectedPoints[0]['img1_x'],selectedPoints[0]['img1_y']]
+    p1b = [selectedPoints[0]['img2_x'],selectedPoints[0]['img2_y']]
 
-    p2a = np.float32([selectedPoints[1]['img1_x'],selectedPoints[1]['img1_y']])
-    p2b = np.float32([selectedPoints[1]['img2_x'], selectedPoints[1]['img2_y']])
+    p2a = [selectedPoints[1]['img1_x'],selectedPoints[1]['img1_y']]
+    p2b = [selectedPoints[1]['img2_x'], selectedPoints[1]['img2_y']]
 
-    p3a = np.float32([selectedPoints[2]['img1_x'], selectedPoints[2]['img1_y']])
-    p3b = np.float32([selectedPoints[2]['img2_x'], selectedPoints[2]['img2_y']])
+    p3a = [selectedPoints[2]['img1_x'], selectedPoints[2]['img1_y']]
+    p3b = [selectedPoints[2]['img2_x'], selectedPoints[2]['img2_y']]
 
-    p4a = np.float32([selectedPoints[3]['img1_x'],selectedPoints[0]['img1_y']])
-    p4b = np.float32([selectedPoints[3]['img2_x'],selectedPoints[0]['img2_y']])
+    p4a = [selectedPoints[3]['img1_x'],selectedPoints[0]['img1_y']]
+    p4b = [selectedPoints[3]['img2_x'],selectedPoints[0]['img2_y']]
 
-    p5a = np.float32([selectedPoints[4]['img1_x'],selectedPoints[1]['img1_y']])
-    p5b = np.float32([selectedPoints[4]['img2_x'], selectedPoints[1]['img2_y']])
+    p5a = [selectedPoints[4]['img1_x'],selectedPoints[1]['img1_y']]
+    p5b = [selectedPoints[4]['img2_x'], selectedPoints[1]['img2_y']]
 
-    p6a = np.float32([selectedPoints[5]['img1_x'], selectedPoints[2]['img1_y']])
-    p6b = np.float32([selectedPoints[5]['img2_x'], selectedPoints[2]['img2_y']])
-
-    #print(p3a,p3b)
-
-    #Contains only three points:
-    image2pointsmatrix = np.array([
-        [p1b[0]],
-        [p1b[1]],
-        [p2b[0]],
-        [p2b[1]],
-        [p3b[0]],
-        [p3b[1]],
-    ])
-
-    #Contains 6 total points:
-    # image2pointsmatrix = np.array([
-    #     [p1b[0]],
-    #     [p1b[1]],
-    #     [p2b[0]],
-    #     [p2b[1]],
-    #     [p3b[0]],
-    #     [p3b[1]],
-    #     [p4b[0]],
-    #     [p4b[1]],
-    #     [p5b[0]],
-    #     [p5b[1]],
-    #     [p6b[0]],
-    #     [p6b[1]],
-    # ])
-
-    print(image2pointsmatrix)
-
-    #Contains only 3 points:
-    image1pointsmatrix = np.array([
-        [p1a[0],p1a[1],1,0,0,0],
-        [0,0,0,p1a[0],p1a[1],1],
-        [p2a[0],p2a[1],1,0,0,0],
-        [0,0,0,p2a[0],p2a[1],1],
-        [p3a[0],p3a[1],1,0,0,0],
-        [0,0,0,p3a[0],p3a[1],1]
-    ])
-
-    #Contains 6 points in total:
-    # image1pointsmatrix = np.array([
-    #     [p1a[0], p1a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p1a[0], p1a[1], 1,0,0,0,0,0,0],
-    #     [p2a[0], p2a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p2a[0], p2a[1], 1,0,0,0,0,0,0],
-    #     [p3a[0], p3a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p3a[0], p3a[1], 1,0,0,0,0,0,0],
-    #     [p4a[0], p4a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p4a[0], p4a[1], 1,0,0,0,0,0,0],
-    #     [p5a[0], p5a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p5a[0], p5a[1], 1,0,0,0,0,0,0],
-    #     [p6a[0], p6a[1], 1, 0, 0, 0,0,0,0,0,0,0],
-    #     [0, 0, 0, p6a[0], p6a[1], 1,0,0,0,0,0,0]
-    # ])
-
-    print("IMAGE ONE:")
-    print(image1pointsmatrix)
-    print(image1pointsmatrix.shape)
-
-    #Used for 3 points only:
-    m0,m1,m2,m3,m4,m5 = None,None,None,None,None,None
-
-    #Used for 6 points:
-    #m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11 = None,None,None,None,None,None,None,None,None,None,None,None
-
-    affineparameters = np.array([
-        [m0],
-        [m1],
-        [m2],
-        [m3],
-        [m4],
-        [m5],
-    ])
-
-    #Used for 6 points:
-    # affineparameters = np.array([
-    #     [m0],
-    #     [m1],
-    #     [m2],
-    #     [m3],
-    #     [m4],
-    #     [m5],
-    #     [m6],
-    #     [m7],
-    #     [m8],
-    #     [m9],
-    #     [m10],
-    #     [m11]
-    # ])
-
-    print("AFFINEPARAMETERS:")
-    #print(affineparameters)
-
-    np.linalg.inv(image1pointsmatrix)
-    affineparameters = np.dot(np.linalg.inv(image1pointsmatrix),image2pointsmatrix)
-    #print(affineparameters)
-    print("INDEXING:" + str(affineparameters[0][0]))
-
-    m_matrix = np.asarray([
-        [affineparameters[1][0],affineparameters[2][0]],
-        [affineparameters[3][0], affineparameters[4][0]]
-        ])
-    print("M MATRIX:")
-    print(m_matrix)
-    print(m_matrix.shape)
-    print("XY MATRIX:")
-    p1a_matrix = np.array([
-        [p1a[0]],
-        [p1a[1]]
-
-    ])
-    p1b_matrix = np.array([
-        [p1b[0]],
-        [p1b[1]]
-    ])
-    print(p1a_matrix.shape)
-
-    txty_matrix = p1b_matrix-np.dot(m_matrix, p1a_matrix)
-
-    print("TXTY:")
-    print(txty_matrix.shape)
-    print(txty_matrix)
-    print("--------")
-
-    print()
-
-    supposedlyUV = np.add(np.dot(m_matrix, p1a_matrix),txty_matrix)
-    print(p1b)
-    print(supposedlyUV)
-
-    testpointInImage2_matrix = np.array([
-        [],
-        []
-    ])
-
-    #[{'point_id': 1, 'img1_x': 301.92447289474796, 'img1_y': 170.8799805636541, 'img2_x': 152.84938944521912, 'img2_y': 194.1190898719737}]
-    solveForUVUsingTransformParameters((301.92447289474796,170.8799805636541), (m_matrix[0][0],m_matrix[0][1],m_matrix[1][0],m_matrix[1][1]), (txty_matrix[0][0],txty_matrix[1][0]),p1a,p2a,p3a)
-    newpoint = np.add(np.dot(m_matrix, np.array([
-        [p3a[0]],
-        [p3a[1]]
-    ])), txty_matrix)
-    print(newpoint)
-
-    print(cv2.getAffineTransform(np.array([p1a,p2a,p3a]),np.array([p1b,p2b,p3b])))
+    p6a = [selectedPoints[5]['img1_x'], selectedPoints[2]['img1_y']]
+    p6b = [selectedPoints[5]['img2_x'], selectedPoints[2]['img2_y']]
 
 
+    solveForUVUsingTransformParameters((301.92447289474796,170.8799805636541), p1a,p2a,p3a,p1b,p2b,p3b)
+    print("Actual:[152.84938944521912,194.1190898719737]\n")
 
+
+    solveForUVUsingTransformParameters(p3a,p1a,p2a,p3a,p1b,p2b,p3b)
+    print("Actual:"+str(p3b)+'\n')
+
+
+    solveForUVUsingTransformParameters((229.3558371, 201.8421804), p1a, p2a, p3a,p1b,p2b,p3b)
+    print("Actual:[78.917,222.779]"+'\n')
+
+    solveForUVUsingTransformParameters((361.18058933, 132.82804624), p1a, p2a, p3a,p1b,p2b,p3b)
 
 
 main()
