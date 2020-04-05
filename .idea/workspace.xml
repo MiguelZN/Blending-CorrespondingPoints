@@ -18,13 +18,47 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="656" lean-forward="true" selection-start-line="656" selection-end-line="656" />
+            <state relative-caret-position="117">
+              <caret line="864" column="4" selection-start-line="864" selection-start-column="4" selection-end-line="864" selection-end-column="4" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/linalg/linalg.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="184">
+              <caret line="546" selection-start-line="546" selection-end-line="546" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_images/im1_2.JPG">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_images/im1_3.JPG">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_images/city2.jpg">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_images/city3.jpg">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_images/im2_1.JPG">
+          <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -50,7 +84,6 @@
       <find>[</find>
       <find>displayImageGivenArray</find>
       <find>newInten</find>
-      <find>Expand</find>
       <find>Lap</find>
       <find>print(</find>
       <find>try</find>
@@ -60,6 +93,11 @@
       <find>dar</find>
       <find>instance</find>
       <find>isinstance</find>
+      <find>dparray</find>
+      <find>np.</find>
+      <find>ScaleBy</find>
+      <find>Expand</find>
+      <find>LINALG</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -73,9 +111,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="720" />
+    <option name="x" value="704" />
     <option name="y" value="23" />
-    <option name="width" value="720" />
+    <option name="width" value="736" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -91,11 +129,6 @@
             <path>
               <item name="CISC442PR1" type="b2602c69:ProjectViewProjectNode" />
               <item name="CISC442PR1" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CISC442PR1" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CISC442PR1" type="462c0819:PsiDirectoryNode" />
-              <item name="input_images" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -161,11 +194,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="720" y="23" width="720" height="877" extended-state="0" />
+    <frame x="704" y="23" width="736" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.5008347" side_tool="true" visible="true" weight="0.29756796" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.29756796" />
+      <window_info id="Favorites" sideWeight="0.5008347" side_tool="true" visible="true" weight="0.07972028" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.07972028" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -215,10 +248,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/im2_1.JPG">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/city2.jpg">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/im1_3.JPG">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/im1_2.JPG">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/city3.jpg">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/linalg/linalg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="546" selection-start-line="546" selection-end-line="546" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="656" lean-forward="true" selection-start-line="656" selection-end-line="656" />
+        <state relative-caret-position="117">
+          <caret line="864" column="4" selection-start-line="864" selection-start-column="4" selection-end-line="864" selection-end-column="4" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
