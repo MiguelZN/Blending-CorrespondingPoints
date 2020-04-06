@@ -448,50 +448,6 @@ def Reconstruct(Ll,N:int = -1):
     return originalimage
 
 
-# refPt = []
-# cropping = False
-# def click_and_crop(image,event,x,y):
-#     # grab references to the global variables
-#     global refPt, cropping
-#     # if the left mouse button was clicked, record the starting
-#     # (x, y) coordinates and indicate that cropping is being
-#     # performed
-#     if event == cv2.EVENT_LBUTTONDOWN:
-#         refPt = [(x, y)]
-#         cropping = True
-#     # check to see if the left mouse button was released
-#     elif event == cv2.EVENT_LBUTTONUP:
-#         # record the ending (x, y) coordinates and indicate that
-#         # the cropping operation is finished
-#         refPt.append((x, y))
-#         cropping = False
-#         # draw a rectangle around the region of interest
-#         cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
-#         cv2.imshow("image", image)
-#         # load the image, clone it, and setup the mouse callback function
-#         clone = image.copy()
-#         cv2.namedWindow("image")
-#         cv2.setMouseCallback("image", click_and_crop)
-#         # keep looping until the 'q' key is pressed
-#         while True:
-#             # display the image and wait for a keypress
-#             cv2.imshow("image", image)
-#             key = cv2.waitKey(1) & 0xFF
-#             # if the 'r' key is pressed, reset the cropping region
-#             if key == ord("r"):
-#                 image = clone.copy()
-#             # if the 'c' key is pressed, break from the loop
-#             elif key == ord("c"):
-#                 break
-#         # if there are two reference points, then crop the region of interest
-#         # from teh image and display it
-#         if len(refPt) == 2:
-#             roi = clone[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-#             cv2.imshow("ROI", roi)
-#             cv2.waitKey(0)
-#         # close all open windows
-#         cv2.destroyAllWindows()
-
 def cropAndBlendGivenImages(listofimagepaths:[str]):
     MEAN_KERNEL = np.full((3, 3), 1)
     GAUSSIAN_KERNEL = np.array([
@@ -597,105 +553,71 @@ def cropAndBlendGivenImages(listofimagepaths:[str]):
     cv2.destroyAllWindows()
 
 
+def findCorrespondingImage2Point(point,image1image2points:dict):
+    #The image one points matrix: (used to find affine parameters)
+    imageOnePoints_matrix = np.zeros((2*len(image1image2points),6))
 
-def solveForUVUsingTransformParameters(point,p1a,p2a,p3a,p1b,p2b,p3b):
-    # image1pointsNoTxTyMatrix = np.array([
-    #     [p1a[0],p1a[1],1,0,0,0],
-    #     [0,0,0,p1a[0],p1a[1],1],
-    #     [p2a[0],p2a[1],1,0,0,0],
-    #     [0,0,0,p2a[0],p2a[1],1],
-    #     [p3a[0],p3a[1],1,0,0,0],
-    #     [0,0,0,p3a[0],p3a[1],1]
-    # ])
+    #The image two points for image one points: (used to find affine parameters)
+    resultsTwoPoints_matrix = np.zeros((2*len(image1image2points),1))
 
+    #Creates the 2d arrays for n amount of points
+    for i in range(len(image1image2points)):
+        imageOnePoints_matrix[i*2] = [image1image2points[i]['img1_x'],image1image2points[i]['img1_y'],0,0,1,0]
+        imageOnePoints_matrix[(i*2)+1] = [0,0,image1image2points[i]['img1_x'],image1image2points[i]['img1_y'],0,1]
+        
+        resultsTwoPoints_matrix[i*2]= image1image2points[i]['img2_x']
+        resultsTwoPoints_matrix[(i*2)+1]= image1image2points[i]['img2_y']
 
+    m1m2m3m4txty_matrix = None
 
-    resultPointsMatrix = np.array([
-        [p1b[0]],
-        [p1b[1]],
-        [p2b[0]],
-        [p2b[1]],
-        [p3b[0]],
-        [p3b[1]]
-    ])
+    #If the image1image2points contains more than 3 points then fixes overconstraint:
+    if(3<len(image1image2points)):
+        m1m2m3m4txty_matrix = (np.linalg.inv(imageOnePoints_matrix.T@imageOnePoints_matrix)@imageOnePoints_matrix.T)@resultsTwoPoints_matrix
 
-    # print("NEW POINTS:")
-    # print(resultPointsMatrix)
-
-    #affineparametersMatrix = np.linalg.inv(image1pointsNoTxTyMatrix)@resultPointsMatrix
-    # print("AFFINE:")
-    # print(affineparametersMatrix)
-
-    image1pointsWithTxTyMatrix = np.array([
-        [p1a[0], p1a[1], 0, 0, 1, 0],
-        [0, 0, p1a[0], p1a[1],0, 1],
-        [p2a[0], p2a[1], 0, 0, 1, 0],
-        [0, 0, p2a[0], p2a[1],0, 1],
-        [p3a[0], p3a[1], 0, 0, 1, 0],
-        [0, 0, p3a[0], p3a[1],0, 1]
-    ])
-
-    if((len(image1pointsWithTxTyMatrix)/2)>3):
-        print(len(image1pointsWithTxTyMatrix))
-        print("OVERCONSTRAINED")
+    #If the image1image2points contain 3 points then multiply by the inverse matrix
+    elif(len(image1image2points)==3):
+        m1m2m3m4txty_matrix = np.linalg.inv(imageOnePoints_matrix)@resultsTwoPoints_matrix
     else:
-        print("NOT OVERCONSTRAINED")
+        raise Exception("ERROR:The image1image2points are neither 3 points or more!")
 
-
-    # print("ACTUAL AFFINE:")
-    # actualaffine = cv2.getAffineTransform(np.float32([p1a,p2a,p3a]),np.float32([p1b,p2b,p3b]))
-    # print(actualaffine)
-    # print(actualaffine.shape)
-
-    m1m2m3m4txtyMatrix = np.linalg.inv(image1pointsWithTxTyMatrix)@resultPointsMatrix
-    # print("M1M2M3M4TXTY MATRIX:")
-    # print(m1m2m3m4txtyMatrix)
-    # print(m1m2m3m4txtyMatrix.shape)
-    #
-    # print("FIRST:")
-    # print(m1m2m3m4txtyMatrix[0][0])
-    # print("LAST:")
-    # print(m1m2m3m4txtyMatrix[5][0])
-    # print(m1m2m3m4txtyMatrix[3][0])
-
+    #Pulls out the transformation parameters:
     m1m2m3m4_matrix = np.array([
-        [m1m2m3m4txtyMatrix[0][0],m1m2m3m4txtyMatrix[1][0]],
-        [m1m2m3m4txtyMatrix[2][0],m1m2m3m4txtyMatrix[3][0]]
+        [m1m2m3m4txty_matrix[0][0], m1m2m3m4txty_matrix[1][0]],
+        [m1m2m3m4txty_matrix[2][0], m1m2m3m4txty_matrix[3][0]]])
+    txty_matrix = np.array([
+        [m1m2m3m4txty_matrix[4][0]],
+        [m1m2m3m4txty_matrix[5][0]]
     ])
 
-    xy_matrix = np.array([
+    #print("m1m2m3m4_matrix:")
+    #print(m1m2m3m4_matrix)
+    #print(txty_matrix.shape)
+
+
+    #Converts image1 point into matrix equivalent:
+    image1Point = np.array([
         [point[0]],
         [point[1]]
     ])
 
-    txty_matrix = np.array([
-        [m1m2m3m4txtyMatrix[4][0]],
-        [m1m2m3m4txtyMatrix[5][0]]
-    ])
+    #print("imageOnePoints_matrix:")
+    #print(imageOnePoints_matrix)
+    #print(image1Point)
 
-    x = np.linalg.inv(image1pointsWithTxTyMatrix)@resultPointsMatrix
-    # print("X:")
-    # print(x)
-
-    uv_matrix = (m1m2m3m4_matrix@xy_matrix)+txty_matrix
-
-    print("Old Point:[" + str(xy_matrix[0][0]) + "," + str(xy_matrix[1][0]) + "]")
-
-    print("New Point:["+str(uv_matrix[0][0])+","+str(uv_matrix[1][0])+"]")
+    #Calculates the corresponding image 2 point by the transformation paramters and image 1 point:
+    correspondingImage2Point = (m1m2m3m4_matrix@image1Point)+txty_matrix
 
 
+    print("Old Point:[" + str(image1Point[0][0]) + "," + str(image1Point[1][0]) + "]")
+    print("New Point:["+str(correspondingImage2Point[0][0])+","+str(correspondingImage2Point[1][0])+"]")
 
-    return uv_matrix
-
-
-
+    return correspondingImage2Point
 
 
 circles = []
 def main():
-    listOfImages = getAllImagesFromInputImagesDir(IMAGEDIR,True)
-
-    # Kernels
+    #PART1-------------------------------
+    #Kernels
     MEAN_KERNEL = np.full((3, 3), 1)
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
@@ -761,84 +683,56 @@ def main():
         [0, 1, 1, 1, -10]
     ])
 
+    #Gets a list of imagepaths (Strings) to all images contained within ./input_images folder:
+    listOfImages = getAllImagesFromInputImagesDir(IMAGEDIR,True)  
+
+    #Select the specified image from the list of images by giving it the name of the image:
     selectedImagePath = getImageFromListOfImages(listOfImages,'im1')
     print(selectedImagePath)
 
-    wantGrayImage = False  #If false gets a colored image
-    oldimage = getImageArray(selectedImagePath,wantGrayImage)
-    oldimagecopy = oldimage.copy()
-    #displayImageGivenArray(oldimage)
-    #Reconstruct(LaplacianPyramids(oldimage,8))
+    #If wantGrayImage is false gets a colored image, otherwise gets a gray image
+    wantGrayImage = False
+    image = getImageArray(selectedImagePath,wantGrayImage)
+    image_copy = image.copy()
 
 
+    #displayImageGivenArray(image_copy)
+    #Reconstruct(LaplacianPyramids(image_copy,8))
+    cropAndBlendGivenImages(listOfImages[3:6])
 
-    print("WORKING")
-
-
-    #cropAndBlendGivenImages(listOfImages[3:6])
-
-    # imageA = getImageArray(listOfImages[0],False)
-    # imageB = getImageArray(listOfImages[4],False)
-    # imageB=ScaleByGivenDimensions(imageB, (imageA.shape[1], imageA.shape[0]))
-    #
-    # LA = LaplacianPyramids(imageA,5)
-    # LB = LaplacianPyramids(imageB,5)
-
-    cropregion = None
-    #cropregion[0:60] = [[[255,255,255]]]
-    #print(cropregion)
 
     #displayImageGivenArray(oldimage)
+
+
+
+    #PART2-------------------------------------------------------------
+    #Gets corresponding images 1,2:
     mountainimage1 = getImageFromListOfImages(listOfImages, 'im1_1')
     mountainimage2 = getImageFromListOfImages(listOfImages, 'im1_2')
-    #controlpointlist = cpselect(mountainimage1,mountainimage2)
 
-    #print(controlpointlist)
+    #(These two set of points already contain points selected from cpselect)
+    threeimage1image2points =[{'point_id': 1, 'img1_x': 209.89760003380235, 'img1_y': 81.64180081970682, 'img2_x': 64.54077407360467, 'img2_y': 99.30352389402975}, {'point_id': 2, 'img1_x': 304.71316601174635, 'img1_y': 169.95041619132132, 'img2_x': 154.70851818988467, 'img2_y': 193.18952549964092}, {'point_id': 3, 'img1_x': 246.15061055478094, 'img1_y': 210.8512485739638, 'img2_x': 93.35726961592093, 'img2_y': 233.16079350995062}]
+    morethanthreeimage1image2points =[{'point_id': 1, 'img1_x': 209.89760003380235, 'img1_y': 81.64180081970682, 'img2_x': 64.54077407360467, 'img2_y': 99.30352389402975}, {'point_id': 2, 'img1_x': 304.71316601174635, 'img1_y': 169.95041619132132, 'img2_x': 154.70851818988467, 'img2_y': 193.18952549964092}, {'point_id': 3, 'img1_x': 246.15061055478094, 'img1_y': 210.8512485739638, 'img2_x': 93.35726961592093, 'img2_y': 233.16079350995062}, {'point_id': 4, 'img1_x': 201.5315206828073, 'img1_y': 150.42956437233283, 'img2_x': 51.52687286094567, 'img2_y': 170.8799805636541}, {'point_id': 5, 'img1_x': 393.0217813833608, 'img1_y': 47.247919043393836, 'img2_x': 243.01713356149924, 'img2_y': 78.85310770270848}]
 
-    #three more points:
-    #[{'point_id': 1, 'img1_x': 230.3480162251236, 'img1_y': 204.3442979676343, 'img2_x': 77.55467528626366, 'img2_y': 226.65384290362113}, {'point_id': 2, 'img1_x': 225.70019436345967, 'img1_y': 155.07738623399678, 'img2_x': 75.6955465415981, 'img2_y': 178.31649554231637}, {'point_id': 3, 'img1_x': 299.13577977774963, 'img1_y': 178.31649554231637, 'img2_x': 150.06069632822084, 'img2_y': 202.48516922296875}]
+    selectedPoints = threeimage1image2points
+    #print(selectedPoints)
 
+    #(Uncomment below to get points manually using cpselect)
+    #selectedPoints = cpselect(mountainimage1,mountainimage2)
 
-    selectedPoints = [{'point_id': 1, 'img1_x': 212.6862931508007, 'img1_y': 82.5713651920396, 'img2_x': 66.39990281827022, 'img2_y': 104.88091012802641}, {'point_id': 2, 'img1_x': 395.8104745003592, 'img1_y': 45.388790298728225, 'img2_x': 283.91796594414166, 'img2_y': 49.10704778805939}, {'point_id': 3, 'img1_x': 238.71409557611867, 'img1_y': 210.8512485739638, 'img2_x': 85.92075463725871, 'img2_y': 229.44253602061946},
-                      {'point_id': 3, 'img1_x': 230.3480162251236, 'img1_y': 204.3442979676343,
-                       'img2_x': 77.55467528626366, 'img2_y': 226.65384290362113},
-                      {'point_id': 4, 'img1_x': 225.70019436345967, 'img1_y': 155.07738623399678,
-                       'img2_x': 75.6955465415981, 'img2_y': 178.31649554231637},
-                      {'point_id': 5, 'img1_x': 299.13577977774963, 'img1_y': 178.31649554231637,
-                       'img2_x': 150.06069632822084, 'img2_y': 202.48516922296875}]
-    print(selectedPoints)
+    #Test point (verified to be about the same feature in image 1,2)
+    point4_image1 = [morethanthreeimage1image2points[4]['img1_x'],morethanthreeimage1image2points[4]['img1_y']]
+    point4_image2 = [morethanthreeimage1image2points[4]['img2_x'],morethanthreeimage1image2points[4]['img2_y']]
 
-    p1a = [selectedPoints[0]['img1_x'],selectedPoints[0]['img1_y']]
-    p1b = [selectedPoints[0]['img2_x'],selectedPoints[0]['img2_y']]
+    findCorrespondingImage2Point(point4_image1, selectedPoints)
+    print("Actual:"+str(point4_image2) + '\n')
 
-    p2a = [selectedPoints[1]['img1_x'],selectedPoints[1]['img1_y']]
-    p2b = [selectedPoints[1]['img2_x'], selectedPoints[1]['img2_y']]
+    findCorrespondingImage2Point((366.06,107.67), selectedPoints)
+    print("Actual:216.06, 135.56"+ '\n')
+    #cpselect(mountainimage1, mountainimage2)
+    #366.06,107.67  216.06, 135.56
 
-    p3a = [selectedPoints[2]['img1_x'], selectedPoints[2]['img1_y']]
-    p3b = [selectedPoints[2]['img2_x'], selectedPoints[2]['img2_y']]
-
-    p4a = [selectedPoints[3]['img1_x'],selectedPoints[0]['img1_y']]
-    p4b = [selectedPoints[3]['img2_x'],selectedPoints[0]['img2_y']]
-
-    p5a = [selectedPoints[4]['img1_x'],selectedPoints[1]['img1_y']]
-    p5b = [selectedPoints[4]['img2_x'], selectedPoints[1]['img2_y']]
-
-    p6a = [selectedPoints[5]['img1_x'], selectedPoints[2]['img1_y']]
-    p6b = [selectedPoints[5]['img2_x'], selectedPoints[2]['img2_y']]
-
-
-    solveForUVUsingTransformParameters((301.92447289474796,170.8799805636541), p1a,p2a,p3a,p1b,p2b,p3b)
-    print("Actual:[152.84938944521912,194.1190898719737]\n")
-
-
-    solveForUVUsingTransformParameters(p3a,p1a,p2a,p3a,p1b,p2b,p3b)
-    print("Actual:"+str(p3b)+'\n')
-
-
-    solveForUVUsingTransformParameters((229.3558371, 201.8421804), p1a, p2a, p3a,p1b,p2b,p3b)
-    print("Actual:[78.917,222.779]"+'\n')
-
-    solveForUVUsingTransformParameters((361.18058933, 132.82804624), p1a, p2a, p3a,p1b,p2b,p3b)
-
-
+    findCorrespondingImage2Point((361.42, 133.7), selectedPoints)
+    print("Actual:211.41, 159.73" + '\n')
+    #361.42, 133.7, 211.41, 159.73
 main()
