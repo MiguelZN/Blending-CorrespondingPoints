@@ -392,30 +392,6 @@ def LaplacianPyramids(I,N:int,displayLaplacian:bool=False, displayBothLaplacianA
         laplacianPyramid[i] = currentLaplacian
 
 
-    # for i in range(N-2):
-    #     nextLevelGaussian = gaussianPyramid.item(i+1)
-    #     currentGaussian = gaussianPyramid.item(i)
-    #     expandedGaussian = Expand(nextLevelGaussian,currentGaussian)
-    #     currentLaplacian = currentGaussian-expandedGaussian
-    #
-    #     if(isinstance(currentLaplacian,int)):
-    #         raise Exception("EROR")
-    #
-    #     print("CURRENT GAUSSIAN:")
-    #     displayImageGivenArray(currentGaussian,'Current Gaussian')
-    #     print("EXPANDED GAUSSIAN:")
-    #     displayImageGivenArray(expandedGaussian, 'Expanded Gaussian')
-    #
-    #     laplacianPyramid[i] = currentLaplacian
-    #
-    #     if(isinstance(laplacianPyramid[i],int)):
-    #         raise Exception("ERROR")
-    #
-    #     print("current laplacian:")
-    #     print(currentLaplacian)
-
-
-
 
     print("Finished construction of Laplacian Pyramid, press a key to tap through images...")
 
@@ -550,12 +526,12 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
 
     # create a mask with white pixels
-    mask = np.zeros_like(foregroundImage_copy)
+    mask = np.ones_like(foregroundImage_copy)
     print(mask)
     mask.fill(0)
     print(mask)
 
-    cv2.fillPoly(mask, np.array([circles]), (255, 255, 255))
+    cv2.fillPoly(mask, np.array([circles]), [255,255,255])
     print("Mask:")
     displayImageGivenArray(mask,windowTitle='Mask')
 
@@ -565,7 +541,7 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
 
 
-    NLevels=5
+    NLevels=1
 
     foregroundImage_copy=ScaleImage1ToImage2(foregroundImage_copy,backgroundImage_copy)
     mask = ScaleImage1ToImage2(mask,backgroundImage_copy)
@@ -573,20 +549,75 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
     FORELAPLACIAN = LaplacianPyramids(foregroundImage_copy, NLevels)
     BACKLAPLACIAN = LaplacianPyramids(backgroundImage_copy, NLevels)
+
+    #Reconstruct(FORELAPLACIAN,NLevels)
+    #Reconstruct(BACKLAPLACIAN,NLevels)
+
     MASKGAUSSIAN = GaussianPyramid(mask,NLevels,True)
+
 
     BLENDEDLAPLACIAN = []
 
-    for i in range(NLevels-1):
-        currentFore = FORELAPLACIAN[i]
-        currentBack = BACKLAPLACIAN[i]
-        currentMaskGaussian = MASKGAUSSIAN[i]
+    for i in range(NLevels-1,-1,-1):
+        print("LEVEL:"+str(i))
+        currentFore = np.float32(FORELAPLACIAN[i])
+        print("CURRENT FORE:")
+        print(currentFore)
+        displayImageGivenArray(currentFore)
 
-        currentBlendedLaplacian = (currentMaskGaussian*currentFore)+((1-currentMaskGaussian)*currentBack)
 
-        BLENDEDLAPLACIAN.append(currentBlendedLaplacian)
+        currentBack = np.float32(BACKLAPLACIAN[i])
+        print("CURRENT BACK:")
+        print(currentBack)
+        displayImageGivenArray(currentBack)
+
+
+        currentMaskGaussian = np.float32(MASKGAUSSIAN[i])
+        print("CURRENT MASK:")
+
+        print(currentMaskGaussian)
+
+        print("WEIGHTS MASK GAUSSIAN")
+        weightsMaskGaussian = currentMaskGaussian/255.0
+        #print(weightsMaskGaussian)
+
+        print("INVERTED MASK GAUSSIAN")
+        invertedWeightsMaskGaussian = (255.0-currentMaskGaussian)/255.0
+        #print(invertedWeightsMaskGaussian)
+
+        np.set_printoptions(threshold=1000)
+
+        displayImageGivenArray(currentMaskGaussian)
+
+
+        print("CURRENT BLENDED")
+
+        LeftHalfBlendedLaplacian = currentFore*(weightsMaskGaussian)
+        print("LEFT BLENDED:")
+        np.set_printoptions(threshold=np.inf)
+        print(LeftHalfBlendedLaplacian)
+        displayImageGivenArray(LeftHalfBlendedLaplacian,'Left half')
+
+
+        RightHalfBlendedLaplacian = currentBack*(invertedWeightsMaskGaussian)
+        print("RIGHT BLENDED:")
+        print(RightHalfBlendedLaplacian)
+        displayImageGivenArray(RightHalfBlendedLaplacian,'Right Half')
+        currentBlendedLaplacian = ((cv2.add(LeftHalfBlendedLaplacian,RightHalfBlendedLaplacian)))/255
+
+        print("CURRENT BLENDED:")
+        print(currentBlendedLaplacian)
+        displayImageGivenArray(currentBlendedLaplacian,"Current Blended:")
+
+
+
+
+        BLENDEDLAPLACIAN = [currentBlendedLaplacian]+BLENDEDLAPLACIAN
+
+    #BLENDEDLAPLACIAN[NLevels-1] = FORELAPLACIAN[NLevels-1]
 
     combinedimage = Reconstruct(np.array(BLENDEDLAPLACIAN), NLevels)
+    #Reconstruct(FORELAPLACIAN,NLevels)
 
     cv2.imshow("Combined image:",combinedimage)
     cv2.waitKey(0)
@@ -850,6 +881,9 @@ def main():
     image = getImageArray(selectedImagePath,wantGrayImage)
     image_copy = image.copy()
 
+    #print(np.zeros_like(image))
+    print(cv2.bitwise_not(np.zeros_like(image))/0.5)
+
 
     #print("Started GAUSSIAN 5x5")
     #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL_5x5))
@@ -858,7 +892,7 @@ def main():
     #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL))
     #Reconstruct(LaplacianPyramids(image_copy,8))
 
-    Reconstruct(LaplacianPyramids(getImageArray(listOfImages[6],True),10,displayBothLaplacianAndGaussian=True))
+    #Reconstruct(LaplacianPyramids(getImageArray(listOfImages[7],False),10,displayBothLaplacianAndGaussian=True))
     #Reconstruct(LaplacianPyramids(image_copy,5,True))
     cropAndMaskGivenImages(listOfImages[3],listOfImages[4],wantGrayImage)
 
