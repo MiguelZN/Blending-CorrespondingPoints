@@ -1,18 +1,21 @@
 import numpy as np
 import cv2
-import time
 import os
 import math
-from matplotlib import pyplot
-from cpselect.cpselect import cpselect
-import subprocess
-from enum import Enum
+import tkinter
+from tkinter import filedialog
+
+
 IMAGEDIR = './input_images/'
 
-import subprocess
+'''
+Miguel Zavala
+4/8/20
+CISC442:Computer Vision
+Project 1: blending, associative points
+'''
 
-
-
+#Searches a list of strings and looks for specified image name (string)
 def getImageFromListOfImages(listofimages, want):
     for imagepath in listofimages:
         print(imagepath)
@@ -22,6 +25,8 @@ def getImageFromListOfImages(listofimages, want):
     raise Exception('Could not find image with this name!')
 
 
+#Takes a path directory (string) and checks for all images in that directory
+#Returns a list of image paths (list of strings)
 def getAllImagesFromInputImagesDir(path:str, getabspaths=True):
     listOfImagePaths = []
 
@@ -48,32 +53,20 @@ def getAllImagesFromInputImagesDir(path:str, getabspaths=True):
 
     return listOfImagePaths
 
-
-
-
-
-
+#Takes in an imagepath (string) and displays the image
 def displayImageGivenPath(imagepath:str, wantGrayImage=False):
     img = getImageArray(imagepath,wantGrayImage)
-    # print(img)
-    # print(img[0])
-    # print(len(img)) #prints number of rows (image pixel height)
-    # print(len(img[0])) #prints number of columns (image pixel width)
-    #
-    # print(img[0])
-    # print(img[0][0])
     cv2.imshow('image', img)
     cv2.waitKey(0) #waits for user to type in a key
     cv2.destroyAllWindows()
 
-
-
-
-def displayImageGivenArray(numpyimagearr, windowTitle:str='image'):
+#Takes in an image (np array) and displays the image
+def displayImageGivenArray(numpyimagearr, windowTitle:str='image', waitKey:int=0):
     cv2.imshow(windowTitle, numpyimagearr)
-    cv2.waitKey(0)  # waits for user to type in a key
+    cv2.waitKey(waitKey)  # waits for user to type in a key
     cv2.destroyAllWindows()
 
+#Takes in an image path (string) and returns the image as a np array
 def getImageArray(imagepath:str, intensitiesOnly=True):
     if(intensitiesOnly):
         return cv2.imread(imagepath, 0)
@@ -210,10 +203,10 @@ def Convolve(I,H):
                 summedKernelIntensityValues = int(summedKernelIntensityValues / kernelTotal)
 
                 # Making sure summedKernelIntensityValues variable is within [0,255]
-                if (summedKernelIntensityValues >= 255):
-                    summedKernelIntensityValues = 255
-                if (summedKernelIntensityValues <= 0):
-                    summedKernelIntensityValues = 0
+                # if (summedKernelIntensityValues >= 255):
+                #     summedKernelIntensityValues = 255
+                # if (summedKernelIntensityValues <= 0):
+                #     summedKernelIntensityValues = 0
 
                 newimage.itemset((row_index, column_index), int(summedKernelIntensityValues))
 
@@ -242,20 +235,6 @@ def Convolve(I,H):
                 newimage.itemset((row_index, column_index, 1), summedKernelGreenValues)
                 newimage.itemset((row_index, column_index, 2), summedKernelRedValues)
 
-
-
-            #print("---------------------------------------------------")
-
-
-    # print("HEIGHT:"+str(len(I)))
-    # print("WIDTH:"+str(len(I[0])))
-    # print("ACTUAL:"+str(len(I)*len(I[0])))
-    # print("TOTAL PIXELS:"+str(num_pixels))
-
-    # if(num_pixels==len(I)*len(I[0])):
-    #     print("EQUAL")
-
-    #print(newimage)
 
     return newimage
 
@@ -287,7 +266,8 @@ def Reduce(I,factor:int=0.5):
 
     return new_image
 
-def Scale(I,scaleFactor:int):
+#Scales a given image by a scaleFactor
+def Scale(I,scaleFactor):
     new_width = int(I.shape[1]*scaleFactor)
     new_height = int(I.shape[0]*scaleFactor)
 
@@ -296,9 +276,12 @@ def Scale(I,scaleFactor:int):
     new_image = cv2.resize(I, (new_width,new_height))
     return new_image
 
+#Takes in two images (np arrays) and scales image 1 to the exact dimensions of image 2
+#(did this because sometimes dividing by 2 would result in different sized matrices due to
+#rounding or ceiling or flooring by python)
 def ScaleImage1ToImage2(image1,image2):
-    print(image1)
-    print(image2)
+    # print(image1)
+    # print(image2)
 
     newimage1 = None
     if(image1.shape[0]!=image2.shape[0] or image1.shape[1]!=image2.shape[1]):
@@ -315,7 +298,13 @@ def ScaleByGivenDimensions(I,dim):
 takes image I as input and outputs copy of image expanded,
 twice the width and height of the input. '''
 def Expand(I,otherImage):
-    return ScaleImage1ToImage2(I,otherImage)
+    GAUSSIAN_KERNEL = np.array([
+        [1, 2, 1],
+        [2, 4, 2],
+        [1, 2, 1]
+    ])
+
+    return Convolve(ScaleImage1ToImage2(I,otherImage),GAUSSIAN_KERNEL)
 
 
 '''
@@ -326,8 +315,6 @@ def GaussianPyramid(I,N:int, display:bool=False):
     curr_image = I
     gaussianpyramid = np.arange(N,dtype=np.ndarray)
 
-
-    
     for i in range(0,N):
         try:
             gaussianpyramid.itemset(i,curr_image)
@@ -336,12 +323,7 @@ def GaussianPyramid(I,N:int, display:bool=False):
         except:
             ''
 
-
-    #print(gaussianpyramid)
-    #print(len(gaussianpyramid))
-
     #Goes through each guassian blurred image and displays it
-
     if(display):
         Level = 0
         for i in gaussianpyramid:
@@ -360,25 +342,9 @@ that produces n level Laplacian pyramid of I.
 '''
 def LaplacianPyramids(I,N:int,displayLaplacian:bool=False, displayBothLaplacianAndGaussian:bool=False):
     print("Starting construction of LaplacianPyramid")
-    GAUSSIAN_KERNEL = np.array([
-        [1, 2, 1],
-        [2, 4, 2],
-        [1, 2, 1]
-    ])
-
-    GAUSSIAN_KERNEL_5x5 = np.array([
-        [1, 4, 7, 4, 1],
-        [4, 16, 26, 16, 4],
-        [7, 26, 41, 26, 7],
-        [4, 16, 26, 16, 4],
-        [1, 4, 7, 4, 1]
-    ])
-
     print("Creating Gaussian pyramid for laplacian..")
     gaussianPyramid = GaussianPyramid(I,N)
     print("Finished Gaussian pyramid, starting laplacian pyramid")
-
-
 
     laplacianPyramid = list(range(N))
     NLevelLaplacian = gaussianPyramid.item(N-1)
@@ -391,10 +357,7 @@ def LaplacianPyramids(I,N:int,displayLaplacian:bool=False, displayBothLaplacianA
         currentLaplacian = currentGaussian-expandedGaussian
         laplacianPyramid[i] = currentLaplacian
 
-
-
-    print("Finished construction of Laplacian Pyramid, press a key to tap through images...")
-
+    print("Finished construction of Laplacian Pyramid..")
     p = 0
     if(displayBothLaplacianAndGaussian):
         for image in gaussianPyramid:
@@ -426,11 +389,6 @@ def Reconstruct(Ll,N:int = -1):
         N = lenLaplacian
     print("Starting reconstruction, please wait...")
     originalimage = None
-    GAUSSIAN_KERNEL = np.array([
-        [1, 2, 1],
-        [2, 4, 2],
-        [1, 2, 1]
-    ])
 
     listofreconstructedimages = np.arange(lenLaplacian,dtype=np.ndarray)
     currentimage = Ll[lenLaplacian-1]
@@ -470,7 +428,10 @@ def Reconstruct(Ll,N:int = -1):
     return originalimage
 
 
-def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImage:bool=False):
+
+#Method used for blending two images
+#Allows user to manually draw their own mask onto the foreground image
+def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImage:bool=False, NLevels:int=1):
     MEAN_KERNEL = np.full((3, 3), 1)
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
@@ -486,7 +447,8 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
         [1, 4, 7, 4, 1]
     ])
 
-    circles = []
+    #Method setting up the mouse listeners to detect a user's drawing actions
+    #(Example holding down left mouse and moving which draws circle points on the image)
     def mouse_drawing(event, x, y, flags, params):
         if event == cv2.EVENT_LBUTTONDOWN:
             #print("Left click")
@@ -495,16 +457,22 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
             #print("MOVING")
             circles.append((x, y))
 
+    #Converts the imagepaths into np array images:
     foregroundImage= getImageArray(foregroundImagePath,wantGrayImage)
     foregroundImage_copy = foregroundImage.copy()
-
     backgroundImage= getImageArray(backgroundImagePath, wantGrayImage)
     backgroundImage_copy = backgroundImage.copy()
-    print(circles)
+
+
+    #This holds all of the user drawn points when selecting their mask
     circles = []
 
+    print("->Left Click or hold down Left Click and move to draw onto the image1 to create your own mask.\n"
+          "->When finished, press key 'C' to select the mask.\n"
+          "->Press key 'R' to reset your drawn points.\n"
+          "->Press key 'U' to undo your last drawn point")
 
-
+    #Allows the user to draw on the Foreground image and manually make their own mask
     while True:
         imagewithDrawings = foregroundImage_copy.copy()
         for center_position in circles:
@@ -514,6 +482,7 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
         cv2.setMouseCallback("Foreground Image", mouse_drawing)
         cv2.imshow("Foreground Image", imagewithDrawings)
         key = cv2.waitKey(1)
+
         if key == 27:
             cv2.destroyAllWindows()
             return
@@ -521,129 +490,64 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
             cv2.destroyAllWindows()
             break
         elif key == ord("r"):
+            print("Removing all drawn points...")
             foregroundImage_copy = foregroundImage_copy.copy() #clears out current image from any drawings
             circles = []
+        elif key == ord("u"):
+            print("undo successful..")
+            circles = circles[0:len(circles)-1]
 
 
-    # create a mask with white pixels
+    #Creates a mask with black pixels
     mask = np.ones_like(foregroundImage_copy)
-    print(mask)
     mask.fill(0)
-    print(mask)
 
-    cv2.polylines(mask, np.array([circles]),True, [255,255,255],1)
-    outlinepoints = np.where(np.all(mask == [255,255,255], axis=-1))
-    outlinepoints = zip(outlinepoints[0],outlinepoints[1])
+    #Gets the mask outline (does not fully work)
+    #cv2.polylines(mask, np.array([circles]),True, [255,255,255],1)
+    #outlinepoints = np.where(np.all(mask == [255,255,255], axis=-1))
+    #outlinepoints = zip(outlinepoints[0],outlinepoints[1])
+    #print(outlinepoints)
 
-    print(outlinepoints)
-    cv2.fillPoly(mask, np.array([circles]), [255,255,255])
+    cv2.fillPoly(mask, np.array([circles]), [255,255,255]) #Fills the mask area with white pixels (based on the points user selected)
+    displayImageGivenArray(mask,windowTitle='Mask',waitKey=1000)
 
-    print("Mask:")
-    displayImageGivenArray(mask,windowTitle='Mask')
-
-
-    cropped_image  = cv2.bitwise_and(mask, foregroundImage_copy.copy())
-
-
-    NLevels=1
+    #Gets cropped out image using bitmask (not needed)
+    #cropped_image  = cv2.bitwise_and(mask, foregroundImage_copy.copy())
 
     foregroundImage_copy=ScaleImage1ToImage2(foregroundImage_copy,backgroundImage_copy)
     mask = ScaleImage1ToImage2(mask,backgroundImage_copy)
 
-
+    #Creating the Pyramids (2 Laplacian, 1 Gaussian)
     FORELAPLACIAN = LaplacianPyramids(foregroundImage_copy, NLevels)
     BACKLAPLACIAN = LaplacianPyramids(backgroundImage_copy, NLevels)
+    MASKGAUSSIAN = GaussianPyramid(mask,NLevels)
 
-    #Reconstruct(FORELAPLACIAN,NLevels)
-    #Reconstruct(BACKLAPLACIAN,NLevels)
-
-    MASKGAUSSIAN = GaussianPyramid(mask,NLevels,True)
-
-
+    #Holds the newly created Laplacian Pyramid
     BLENDEDLAPLACIAN = []
-
     for i in range(NLevels-1,-1,-1):
-        print("LEVEL:"+str(i))
-        currentFore = np.float32(FORELAPLACIAN[i])
-        print("CURRENT FORE:")
-        #print(currentFore)
-        #displayImageGivenArray(currentFore)
+        currentFore = np.float32(FORELAPLACIAN[i]) #Current level foreground image of laplacian pyramid
+        currentBack = np.float32(BACKLAPLACIAN[i]) #Current level background image of laplacian pyramid
+        currentMaskGaussian = np.float32(MASKGAUSSIAN[i]) #Current level mask image of gaussian pyramid
 
+        weightsMaskGaussian = currentMaskGaussian/255.0 #Creates weighted mask
+        invertedWeightsMaskGaussian = (255.0-currentMaskGaussian)/255.0 #Creates weighted inversed mask
 
-        currentBack = np.float32(BACKLAPLACIAN[i])
-        print("CURRENT BACK:")
-        #print(currentBack)
-        #displayImageGivenArray(currentBack)
-
-
-        currentMaskGaussian = np.float32(MASKGAUSSIAN[i])
-        print("CURRENT MASK:")
-
-        #print(currentMaskGaussian)
-
-        print("WEIGHTS MASK GAUSSIAN")
-        weightsMaskGaussian = currentMaskGaussian/255.0
-        #print(weightsMaskGaussian)
-
-        print("INVERTED MASK GAUSSIAN")
-        invertedWeightsMaskGaussian = (255.0-currentMaskGaussian)/255.0
-        #print(invertedWeightsMaskGaussian)
-
-        np.set_printoptions(threshold=1000)
-
-        #displayImageGivenArray(currentMaskGaussian)
-
-
-        print("CURRENT BLENDED")
-
-        LeftHalfBlendedLaplacian = np.uint8(currentFore*(weightsMaskGaussian))
-        print("LEFT BLENDED:")
-        np.set_printoptions(threshold=np.inf)
-        #print(LeftHalfBlendedLaplacian)
-        #displayImageGivenArray(LeftHalfBlendedLaplacian,'Left half')
-
-
-        RightHalfBlendedLaplacian = np.uint8(currentBack*(invertedWeightsMaskGaussian))
-        print("RIGHT BLENDED:")
-        #print(RightHalfBlendedLaplacian)
-        #displayImageGivenArray(RightHalfBlendedLaplacian,'Right Half')
+        LeftHalfBlendedLaplacian = currentFore*(weightsMaskGaussian)
+        RightHalfBlendedLaplacian = currentBack*(invertedWeightsMaskGaussian)
         currentBlendedLaplacian = np.uint8(LeftHalfBlendedLaplacian+RightHalfBlendedLaplacian)
-
-        # for point in outlinepoints:
-        #     print("Averaging the outline!")
-        #     print(point)
-        #     print(currentBlendedLaplacian[51][126])
-        #     print(currentBlendedLaplacian.shape)
-        #     currentBlendedPoint = currentBlendedLaplacian[point[0]][point[1]]
-        #     currentBlue = currentBlendedPoint[0]
-        #     currentGreen = currentBlendedPoint[1]
-        #     currentRed = currentBlendedPoint[2]
-        #
-        #     newBlendedPoint = [currentBlue/2,currentGreen/2,currentRed/2]
-        #     currentBlendedLaplacian[point[0]][point[1]] = newBlendedPoint
-
-
-        print("CURRENT BLENDED:")
-        print(currentBlendedLaplacian)
-        #displayImageGivenArray(currentBlendedLaplacian,"Current Blended:")
-
-
-
 
         BLENDEDLAPLACIAN = [currentBlendedLaplacian]+BLENDEDLAPLACIAN
 
 
     combinedimage = Reconstruct(np.array(BLENDEDLAPLACIAN), NLevels)
-
-    # for point in outlinepoints:
-    #     combinedimage[point[0]][point[1]] = [0,0,255]
-
     cv2.imshow("Combined image:",combinedimage)
     cv2.waitKey(0)
 
     cv2.destroyAllWindows()
 
-def cropAndCombineGivenImages(listofimagepaths:[str], wantGrayImage:bool=False):
+
+#Unused method
+def cropAndCombineGivenImages(listofimagepaths:[str], NLevels:int=1,wantGrayImage:bool=False):
     MEAN_KERNEL = np.full((3, 3), 1)
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
@@ -675,7 +579,7 @@ def cropAndCombineGivenImages(listofimagepaths:[str], wantGrayImage:bool=False):
         selectedCropEntireImage = False
         image = getImageArray(imagepath,wantGrayImage)
         image_copy = image.copy()
-        print(circles)
+        #print(circles)
         circles = []
 
 
@@ -732,22 +636,12 @@ def cropAndCombineGivenImages(listofimagepaths:[str], wantGrayImage:bool=False):
     print(imageid)
     combinedimage = np.zeros_like(largestimagefound)
 
-    NLevels=5
+
     combinedimage = croppedimages[0] #combined image starts with first cropped image
     print(combinedimage)
     for i in range(1,len(croppedimages)):
         if (croppedimages[i].shape[0] != combinedimage.shape[0] or croppedimages[i].shape[1] != combinedimage.shape[1]):
             croppedimages[i]= ScaleByGivenDimensions(croppedimages[i], (combinedimage.shape[1], combinedimage.shape[0]))
-
-        else:
-            ''
-
-
-
-
-
-
-
 
         combinedimage = cv2.addWeighted(combinedimage,0.5,croppedimages[i],0.5,0)
 
@@ -758,65 +652,12 @@ def cropAndCombineGivenImages(listofimagepaths:[str], wantGrayImage:bool=False):
     cv2.destroyAllWindows()
 
 
-def findCorrespondingImage2Point(point,image1image2points:dict):
-    #The image one points matrix: (used to find affine parameters)
-    imageOnePoints_matrix = np.zeros((2*len(image1image2points),6))
-
-    #The image two points for image one points: (used to find affine parameters)
-    resultsTwoPoints_matrix = np.zeros((2*len(image1image2points),1))
-
-    #Creates the 2d arrays for n amount of points
-    for i in range(len(image1image2points)):
-        imageOnePoints_matrix[i*2] = [image1image2points[i]['img1_x'],image1image2points[i]['img1_y'],0,0,1,0]
-        imageOnePoints_matrix[(i*2)+1] = [0,0,image1image2points[i]['img1_x'],image1image2points[i]['img1_y'],0,1]
-        
-        resultsTwoPoints_matrix[i*2]= image1image2points[i]['img2_x']
-        resultsTwoPoints_matrix[(i*2)+1]= image1image2points[i]['img2_y']
-
-    m1m2m3m4txty_matrix = None
-
-    #If the image1image2points contains more than 3 points then fixes overconstraint:
-    if(3<len(image1image2points)):
-        m1m2m3m4txty_matrix = (np.linalg.inv(imageOnePoints_matrix.T@imageOnePoints_matrix)@imageOnePoints_matrix.T)@resultsTwoPoints_matrix
-
-    #If the image1image2points contain 3 points then multiply by the inverse matrix
-    elif(len(image1image2points)==3):
-        m1m2m3m4txty_matrix = np.linalg.inv(imageOnePoints_matrix)@resultsTwoPoints_matrix
-    else:
-        raise Exception("ERROR:The image1image2points are neither 3 points or more!")
-
-    #Pulls out the transformation parameters:
-    m1m2m3m4_matrix = np.array([
-        [m1m2m3m4txty_matrix[0][0], m1m2m3m4txty_matrix[1][0]],
-        [m1m2m3m4txty_matrix[2][0], m1m2m3m4txty_matrix[3][0]]])
-    txty_matrix = np.array([
-        [m1m2m3m4txty_matrix[4][0]],
-        [m1m2m3m4txty_matrix[5][0]]
-    ])
-
-    #print("m1m2m3m4_matrix:")
-    #print(m1m2m3m4_matrix)
-    #print(txty_matrix.shape)
-
-
-    #Converts image1 point into matrix equivalent:
-    image1Point = np.array([
-        [point[0]],
-        [point[1]]
-    ])
-
-    #print("imageOnePoints_matrix:")
-    #print(imageOnePoints_matrix)
-    #print(image1Point)
-
-    #Calculates the corresponding image 2 point by the transformation paramters and image 1 point:
-    correspondingImage2Point = (m1m2m3m4_matrix@image1Point)+txty_matrix
-
-
-    print("Old Point:[" + str(image1Point[0][0]) + "," + str(image1Point[1][0]) + "]")
-    print("New Point:["+str(correspondingImage2Point[0][0])+","+str(correspondingImage2Point[1][0])+"]")
-
-    return correspondingImage2Point
+#Allows the user to manually select images
+def browseImagesDialog(startindirectory:str=os.getcwd(),MessageForUser='Please select a file'):
+    root = tkinter.Tk()
+    root.withdraw()  # use to hide tkinter window
+    filepath = filedialog.askopenfilename(parent=root, initialdir=startindirectory, title=MessageForUser,filetypes = (("png files","*.png"),("jpeg files","*.jpg"),("all files","*.*")))
+    return filepath
 
 
 circles = []
@@ -888,67 +729,23 @@ def main():
         [0, 1, 1, 1, -10]
     ])
 
+    #Sets up tkinter root windows and closed it (only need it for user browsing)
+    root = tkinter.Tk()
+    root.withdraw()
+
+    #Allows user to manually pick their two images
+    curr_directory = os.getcwd()
+    image1path = browseImagesDialog(MessageForUser='Select your image1 (Foreground)')
+    image2path = browseImagesDialog(MessageForUser='Select your image2 (Background)')
+
+
     #Gets a list of imagepaths (Strings) to all images contained within ./input_images folder:
     listOfImages = getAllImagesFromInputImagesDir(IMAGEDIR,True)  
 
-    #Select the specified image from the list of images by giving it the name of the image:
-    selectedImagePath = getImageFromListOfImages(listOfImages,'im1')
-    print(selectedImagePath)
 
     #If wantGrayImage is false gets a colored image, otherwise gets a gray image
     wantGrayImage = False
-    image = getImageArray(selectedImagePath,wantGrayImage)
-    image_copy = image.copy()
-
-    #print(np.zeros_like(image))
-    print(cv2.bitwise_not(np.zeros_like(image))/0.5)
+    cropAndMaskGivenImages(image1path,image2path,wantGrayImage, NLevels=3)
 
 
-    #print("Started GAUSSIAN 5x5")
-    #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL_5x5))
-
-    #print("Started GAUSSIAN")
-    #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL))
-    #Reconstruct(LaplacianPyramids(image_copy,8))
-
-    #Reconstruct(LaplacianPyramids(getImageArray(listOfImages[7],False),10,displayBothLaplacianAndGaussian=True))
-    #Reconstruct(LaplacianPyramids(image_copy,5,True))
-    cropAndMaskGivenImages(listOfImages[4],listOfImages[3],wantGrayImage)
-
-
-
-    #displayImageGivenArray(oldimage)
-
-
-
-    #PART2-------------------------------------------------------------
-    #Gets corresponding images 1,2:
-    mountainimage1 = getImageFromListOfImages(listOfImages, 'im1_1')
-    mountainimage2 = getImageFromListOfImages(listOfImages, 'im1_2')
-
-    #(These two set of points already contain points selected from cpselect)
-    threeimage1image2points =[{'point_id': 1, 'img1_x': 209.89760003380235, 'img1_y': 81.64180081970682, 'img2_x': 64.54077407360467, 'img2_y': 99.30352389402975}, {'point_id': 2, 'img1_x': 304.71316601174635, 'img1_y': 169.95041619132132, 'img2_x': 154.70851818988467, 'img2_y': 193.18952549964092}, {'point_id': 3, 'img1_x': 246.15061055478094, 'img1_y': 210.8512485739638, 'img2_x': 93.35726961592093, 'img2_y': 233.16079350995062}]
-    morethanthreeimage1image2points =[{'point_id': 1, 'img1_x': 209.89760003380235, 'img1_y': 81.64180081970682, 'img2_x': 64.54077407360467, 'img2_y': 99.30352389402975}, {'point_id': 2, 'img1_x': 304.71316601174635, 'img1_y': 169.95041619132132, 'img2_x': 154.70851818988467, 'img2_y': 193.18952549964092}, {'point_id': 3, 'img1_x': 246.15061055478094, 'img1_y': 210.8512485739638, 'img2_x': 93.35726961592093, 'img2_y': 233.16079350995062}, {'point_id': 4, 'img1_x': 201.5315206828073, 'img1_y': 150.42956437233283, 'img2_x': 51.52687286094567, 'img2_y': 170.8799805636541}, {'point_id': 5, 'img1_x': 393.0217813833608, 'img1_y': 47.247919043393836, 'img2_x': 243.01713356149924, 'img2_y': 78.85310770270848}]
-
-    selectedPoints = threeimage1image2points
-    #print(selectedPoints)
-
-    #(Uncomment below to get points manually using cpselect)
-    #selectedPoints = cpselect(mountainimage1,mountainimage2)
-
-    #Test point (verified to be about the same feature in image 1,2)
-    point4_image1 = [morethanthreeimage1image2points[4]['img1_x'],morethanthreeimage1image2points[4]['img1_y']]
-    point4_image2 = [morethanthreeimage1image2points[4]['img2_x'],morethanthreeimage1image2points[4]['img2_y']]
-
-    findCorrespondingImage2Point(point4_image1, selectedPoints)
-    print("Actual:"+str(point4_image2) + '\n')
-
-    findCorrespondingImage2Point((366.06,107.67), selectedPoints)
-    print("Actual:216.06, 135.56"+ '\n')
-    #cpselect(mountainimage1, mountainimage2)
-    #366.06,107.67  216.06, 135.56
-
-    findCorrespondingImage2Point((361.42, 133.7), selectedPoints)
-    print("Actual:211.41, 159.73" + '\n')
-    #361.42, 133.7, 211.41, 159.73
 main()
