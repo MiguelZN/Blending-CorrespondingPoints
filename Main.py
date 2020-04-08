@@ -69,8 +69,8 @@ def displayImageGivenPath(imagepath:str, wantGrayImage=False):
 
 
 
-def displayImageGivenArray(numpyimagearr):
-    cv2.imshow('image', numpyimagearr)
+def displayImageGivenArray(numpyimagearr, windowTitle:str='image'):
+    cv2.imshow(windowTitle, numpyimagearr)
     cv2.waitKey(0)  # waits for user to type in a key
     cv2.destroyAllWindows()
 
@@ -274,10 +274,16 @@ def Reduce(I,factor:int=0.5):
         [2, 4, 2],
         [1, 2, 1]
     ])
+    GAUSSIAN_KERNEL_5x5 = np.array([
+        [1, 4, 7, 4, 1],
+        [4, 16, 26, 16, 4],
+        [7, 26, 41, 26, 7],
+        [4, 16, 26, 16, 4],
+        [1, 4, 7, 4, 1]
+    ])
 
-
-    new_image = Convolve(I,GAUSSIAN_KERNEL) #Blurs image using Gaussian Blur kernel
-    new_image = Scale(new_image,factor)#Scales down image
+    curr_image = Convolve(I, GAUSSIAN_KERNEL)
+    new_image = Scale(curr_image,factor)#Scales down image
 
     return new_image
 
@@ -290,6 +296,17 @@ def Scale(I,scaleFactor:int):
     new_image = cv2.resize(I, (new_width,new_height))
     return new_image
 
+def ScaleImage1ToImage2(image1,image2):
+    print(image1)
+    print(image2)
+
+    newimage1 = None
+    if(image1.shape[0]!=image2.shape[0] or image1.shape[1]!=image2.shape[1]):
+        newimage1 = cv2.resize(image1, (image2.shape[1],image2.shape[0]))
+        return newimage1
+    else:
+        return image1
+
 def ScaleByGivenDimensions(I,dim):
     new_image = cv2.resize(I, (dim[0],dim[1]))
     return new_image
@@ -298,52 +315,50 @@ def ScaleByGivenDimensions(I,dim):
 takes image I as input and outputs copy of image expanded,
 twice the width and height of the input. '''
 def Expand(I,otherImage):
-    return ScaleByGivenDimensions(I,(otherImage.shape[1],otherImage.shape[0]))
+    return ScaleImage1ToImage2(I,otherImage)
 
 
 '''
 takes in an image I,
 takes in N (int) is the no. of levels. 
 '''
-def GaussianPyramid(I,N:int):
+def GaussianPyramid(I,N:int, display:bool=False):
     curr_image = I
     gaussianpyramid = np.arange(N,dtype=np.ndarray)
-    gaussianpyramid.itemset(0,curr_image)
 
-    #Creates the gaussian blurred images and places them in guassianpryamid variable
-    #Adds N-1 gaussian blurs to the array since first level is the original image
-    for i in range(1,N):
+
+    
+    for i in range(0,N):
         try:
-            curr_image = Reduce(curr_image)
             gaussianpyramid.itemset(i,curr_image)
-            #print(i)
+            curr_image = Reduce(curr_image)
+
         except:
             ''
-            #print("COULD NOT REDUCE FURTHER")
-            #print(i)
-            #gaussianpyramid.itemset(i,np.array([]))
 
 
     #print(gaussianpyramid)
     #print(len(gaussianpyramid))
 
     #Goes through each guassian blurred image and displays it
-    Level = 0
-    for i in gaussianpyramid:
-        print("Level:" + str(Level))
-        try:
-            displayImageGivenArray(i)
-        except:
-            print("Could not display this Guassian Level:"+str(Level)+" image!(perhaps too small?)")
 
-        Level+=1
+    if(display):
+        Level = 0
+        for i in gaussianpyramid:
+            print("Level:" + str(Level))
+            try:
+                displayImageGivenArray(i)
+            except:
+                print("Could not display this Guassian Level:"+str(Level)+" image!(perhaps too small?)")
+
+            Level+=1
 
     return gaussianpyramid
 
 '''
 that produces n level Laplacian pyramid of I.
 '''
-def LaplacianPyramids(I,N:int):
+def LaplacianPyramids(I,N:int,displayLaplacian:bool=False, displayBothLaplacianAndGaussian:bool=False):
     print("Starting construction of LaplacianPyramid")
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
@@ -351,47 +366,74 @@ def LaplacianPyramids(I,N:int):
         [1, 2, 1]
     ])
 
-    BIG_GAUSSIAN_KERNEL = np.array([
-        [1,1,1,1,1],
-        [1,2,2,2,1],
-        [1,2,5,2,1],
-        [1,2,2,2,1],
-        [1,1,1,1,1]
+    GAUSSIAN_KERNEL_5x5 = np.array([
+        [1, 4, 7, 4, 1],
+        [4, 16, 26, 16, 4],
+        [7, 26, 41, 26, 7],
+        [4, 16, 26, 16, 4],
+        [1, 4, 7, 4, 1]
     ])
 
-    listofgaussianimages = []
-    listoflaplacianimages = []
-
-    currentImage = I
-    for i in range(0,N):
-        currentGaussianImage = Convolve(currentImage,GAUSSIAN_KERNEL)
-        listofgaussianimages.append(currentGaussianImage)
-
-        #displayImageGivenArray(currentGaussianImage)
+    print("Creating Gaussian pyramid for laplacian..")
+    gaussianPyramid = GaussianPyramid(I,N)
+    print("Finished Gaussian pyramid, starting laplacian pyramid")
 
 
-        currentLaplacianImage = currentImage-currentGaussianImage
-        listoflaplacianimages.append(currentLaplacianImage)
-        #displayImageGivenArray(currentLaplacianImage)
 
-        currentImage = Reduce(currentImage)
+    laplacianPyramid = list(range(N))
+    NLevelLaplacian = gaussianPyramid.item(N-1)
 
-    listoflaplacianimages[len(listoflaplacianimages)-1]=currentImage
+    laplacianPyramid[N-1] = NLevelLaplacian
+    for i in range(N-2,-1,-1):
+        nextLevelGaussian = gaussianPyramid.item(i+1)
+        currentGaussian = gaussianPyramid.item(i)
+        expandedGaussian = Expand(nextLevelGaussian,currentGaussian)
+        currentLaplacian = currentGaussian-expandedGaussian
+        laplacianPyramid[i] = currentLaplacian
+
+
+    # for i in range(N-2):
+    #     nextLevelGaussian = gaussianPyramid.item(i+1)
+    #     currentGaussian = gaussianPyramid.item(i)
+    #     expandedGaussian = Expand(nextLevelGaussian,currentGaussian)
+    #     currentLaplacian = currentGaussian-expandedGaussian
+    #
+    #     if(isinstance(currentLaplacian,int)):
+    #         raise Exception("EROR")
+    #
+    #     print("CURRENT GAUSSIAN:")
+    #     displayImageGivenArray(currentGaussian,'Current Gaussian')
+    #     print("EXPANDED GAUSSIAN:")
+    #     displayImageGivenArray(expandedGaussian, 'Expanded Gaussian')
+    #
+    #     laplacianPyramid[i] = currentLaplacian
+    #
+    #     if(isinstance(laplacianPyramid[i],int)):
+    #         raise Exception("ERROR")
+    #
+    #     print("current laplacian:")
+    #     print(currentLaplacian)
+
+
+
+
     print("Finished construction of Laplacian Pyramid, press a key to tap through images...")
 
     p = 0
-    for image in listofgaussianimages:
-        print("Displaying Gaussian Image Level " + str(p) + ":")
-        displayImageGivenArray(image)
-        p+=1
+    if(displayBothLaplacianAndGaussian):
+        for image in gaussianPyramid:
+            print("Displaying Gaussian Image Level " + str(p) + ":")
+            displayImageGivenArray(image)
+            p+=1
 
-    for i in range(len(listoflaplacianimages)-1,-1,-1):
-        image = listoflaplacianimages[i]
-        print("Displaying Laplacian Image Level "+str(i)+":")
-        displayImageGivenArray(image)
+    if(displayLaplacian or displayBothLaplacianAndGaussian):
+        for i in range(len(laplacianPyramid)-1,-1,-1):
+            image = laplacianPyramid[i]
+            print("Displaying Laplacian Image Level "+str(i)+":")
+            displayImageGivenArray(image)
 
 
-    return np.array(listoflaplacianimages)
+    return np.array(laplacianPyramid)
 
 
 
@@ -418,12 +460,16 @@ def Reconstruct(Ll,N:int = -1):
     currentimage = Ll[lenLaplacian-1]
     listofreconstructedimages.itemset(lenLaplacian-1,currentimage)
 
+    for image in Ll:
+        print("LL:")
+        print(image)
+
     for i in range(N - 2, -1, -1):
         currentLaplacianImage = Ll.item(i)
 
         #Expand first and then blur because expanded image will have irregularities if not blurred
-        currentimage = Convolve(Expand(currentimage,currentLaplacianImage),GAUSSIAN_KERNEL)
-        #currentimage = Expand(currentimage, currentLaplacianImage)
+        #currentimage = Convolve(Expand(currentimage,currentLaplacianImage),GAUSSIAN_KERNEL)
+        currentimage = Expand(currentimage, currentLaplacianImage)
         currentimage = currentimage+currentLaplacianImage
         #displayImageGivenArray(currentimage)
         listofreconstructedimages.itemset(i,currentimage)
@@ -448,13 +494,121 @@ def Reconstruct(Ll,N:int = -1):
     return originalimage
 
 
-def cropAndBlendGivenImages(listofimagepaths:[str]):
+def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImage:bool=False):
     MEAN_KERNEL = np.full((3, 3), 1)
     GAUSSIAN_KERNEL = np.array([
         [1, 2, 1],
         [2, 4, 2],
         [1, 2, 1]
     ])
+
+    GAUSSIAN_KERNEL_5x5 = np.array([
+        [1, 4, 7, 4, 1],
+        [4, 16, 26, 16, 4],
+        [7, 26, 41, 26, 7],
+        [4, 16, 26, 16, 4],
+        [1, 4, 7, 4, 1]
+    ])
+
+    circles = []
+    def mouse_drawing(event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            #print("Left click")
+            circles.append((x, y))
+        elif event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:
+            #print("MOVING")
+            circles.append((x, y))
+
+    foregroundImage= getImageArray(foregroundImagePath,wantGrayImage)
+    foregroundImage_copy = foregroundImage.copy()
+
+    backgroundImage= getImageArray(backgroundImagePath, wantGrayImage)
+    backgroundImage_copy = backgroundImage.copy()
+    print(circles)
+    circles = []
+
+
+
+    while True:
+        imagewithDrawings = foregroundImage_copy.copy()
+        for center_position in circles:
+            cv2.circle(imagewithDrawings, center_position, 2, (0, 0, 255), -1)
+
+        cv2.namedWindow("Foreground Image")
+        cv2.setMouseCallback("Foreground Image", mouse_drawing)
+        cv2.imshow("Foreground Image", imagewithDrawings)
+        key = cv2.waitKey(1)
+        if key == 27:
+            cv2.destroyAllWindows()
+            return
+        elif key == ord("c"):
+            cv2.destroyAllWindows()
+            break
+        elif key == ord("r"):
+            foregroundImage_copy = foregroundImage_copy.copy() #clears out current image from any drawings
+            circles = []
+
+
+    # create a mask with white pixels
+    mask = np.zeros_like(foregroundImage_copy)
+    print(mask)
+    mask.fill(0)
+    print(mask)
+
+    cv2.fillPoly(mask, np.array([circles]), (255, 255, 255))
+    print("Mask:")
+    displayImageGivenArray(mask,windowTitle='Mask')
+
+
+    cropped_image  = cv2.bitwise_and(mask, foregroundImage_copy.copy())
+
+
+
+
+    NLevels=5
+
+    foregroundImage_copy=ScaleImage1ToImage2(foregroundImage_copy,backgroundImage_copy)
+    mask = ScaleImage1ToImage2(mask,backgroundImage_copy)
+
+
+    FORELAPLACIAN = LaplacianPyramids(foregroundImage_copy, NLevels)
+    BACKLAPLACIAN = LaplacianPyramids(backgroundImage_copy, NLevels)
+    MASKGAUSSIAN = GaussianPyramid(mask,NLevels,True)
+
+    BLENDEDLAPLACIAN = []
+
+    for i in range(NLevels-1):
+        currentFore = FORELAPLACIAN[i]
+        currentBack = BACKLAPLACIAN[i]
+        currentMaskGaussian = MASKGAUSSIAN[i]
+
+        currentBlendedLaplacian = (currentMaskGaussian*currentFore)+((1-currentMaskGaussian)*currentBack)
+
+        BLENDEDLAPLACIAN.append(currentBlendedLaplacian)
+
+    combinedimage = Reconstruct(np.array(BLENDEDLAPLACIAN), NLevels)
+
+    cv2.imshow("Combined image:",combinedimage)
+    cv2.waitKey(0)
+
+    cv2.destroyAllWindows()
+
+def cropAndCombineGivenImages(listofimagepaths:[str], wantGrayImage:bool=False):
+    MEAN_KERNEL = np.full((3, 3), 1)
+    GAUSSIAN_KERNEL = np.array([
+        [1, 2, 1],
+        [2, 4, 2],
+        [1, 2, 1]
+    ])
+
+    GAUSSIAN_KERNEL_5x5 = np.array([
+        [1, 4, 7, 4, 1],
+        [4, 16, 26, 16, 4],
+        [7, 26, 41, 26, 7],
+        [4, 16, 26, 16, 4],
+        [1, 4, 7, 4, 1]
+    ])
+
     circles = []
     def mouse_drawing(event, x, y, flags, params):
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -469,7 +623,7 @@ def cropAndBlendGivenImages(listofimagepaths:[str]):
     largestimagefound = None
     for imagepath in listofimagepaths:
         selectedCropEntireImage = False
-        image = getImageArray(imagepath,False)
+        image = getImageArray(imagepath,wantGrayImage)
         image_copy = image.copy()
         print(circles)
         circles = []
@@ -533,19 +687,20 @@ def cropAndBlendGivenImages(listofimagepaths:[str]):
     print(combinedimage)
     for i in range(1,len(croppedimages)):
         if (croppedimages[i].shape[0] != combinedimage.shape[0] or croppedimages[i].shape[1] != combinedimage.shape[1]):
-            croppedimages[i]= (
-                Convolve(ScaleByGivenDimensions(croppedimages[i], (combinedimage.shape[1], combinedimage.shape[0])),
-                         GAUSSIAN_KERNEL))
+            croppedimages[i]= ScaleByGivenDimensions(croppedimages[i], (combinedimage.shape[1], combinedimage.shape[0]))
+
         else:
             ''
 
 
 
 
-        LA = LaplacianPyramids(combinedimage,NLevels)
-        LB = LaplacianPyramids(croppedimages[i],NLevels)
-        LS = LA+LB
-        combinedimage = Convolve(Reconstruct(LS,NLevels),GAUSSIAN_KERNEL)
+
+
+
+
+        combinedimage = cv2.addWeighted(combinedimage,0.5,croppedimages[i],0.5,0)
+
 
     cv2.imshow("Combined image:",combinedimage)
     cv2.waitKey(0)
@@ -643,12 +798,12 @@ def main():
         [100, 0, 25]
     ])
 
-    BIG_GAUSSIAN_KERNEL = np.array([
-        [1,1,1,1,1],
-        [1,2,2,2,1],
-        [1,2,5,2,1],
-        [1,2,2,2,1],
-        [1,1,1,1,1]
+    GAUSSIAN_KERNEL_5x5 = np.array([
+        [1,4,7,4,1],
+        [4,16,26,16,4],
+        [7,26,41,26,7],
+        [4,16,26,16,4],
+        [1,4,7,4,1]
     ])
 
     BLURRY_KERNEL = np.array([
@@ -696,9 +851,17 @@ def main():
     image_copy = image.copy()
 
 
-    #displayImageGivenArray(image_copy)
+    #print("Started GAUSSIAN 5x5")
+    #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL_5x5))
+
+    #print("Started GAUSSIAN")
+    #displayImageGivenArray(Convolve(image_copy,GAUSSIAN_KERNEL))
     #Reconstruct(LaplacianPyramids(image_copy,8))
-    cropAndBlendGivenImages(listOfImages[3:6])
+
+    Reconstruct(LaplacianPyramids(getImageArray(listOfImages[6],True),10,displayBothLaplacianAndGaussian=True))
+    #Reconstruct(LaplacianPyramids(image_copy,5,True))
+    cropAndMaskGivenImages(listOfImages[3],listOfImages[4],wantGrayImage)
+
 
 
     #displayImageGivenArray(oldimage)

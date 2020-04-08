@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="534ff38a-2df2-4d3c-ae23-dbeaaa1fef2b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,10 +18,22 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="448" lean-forward="true" selection-start-line="448" selection-end-line="448" />
+            <state relative-caret-position="410">
+              <caret line="473" column="41" selection-start-line="473" selection-start-column="41" selection-end-line="473" selection-end-column="41" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../ITAI_HW1Pancake/PancakeProblem.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="59">
+              <caret line="18" column="17" lean-forward="true" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#16#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -102,10 +113,21 @@
       <find>affine</find>
       <find>A</find>
       <find>b</find>
+      <find>blue</find>
+      <find>image</find>
+      <find>displ</find>
+      <find>display</find>
+      <find>displayim</find>
+      <find>image1</find>
+      <find>image2</find>
+      <find>gaussian</find>
+      <find>CURRENT LAPLACIAN IMAGE</find>
     </findStrings>
     <replaceStrings>
       <replace>imageOnePoints_matrix</replace>
       <replace>resultsTwoPoints_matrix</replace>
+      <replace>foregroundImage</replace>
+      <replace>backgroundImage</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -119,9 +141,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="555" />
+    <option name="x" value="720" />
     <option name="y" value="23" />
-    <option name="width" value="885" />
+    <option name="width" value="720" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -165,7 +187,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.Run1">
+    <configuration name="Pancake" type="PythonConfigurationType" factoryName="Python">
+      <module name="CISC442PR1" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/Library/Frameworks/Python.framework/Versions/3.7/bin/python3" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../ITAI_HW1Pancake" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../ITAI_HW1Pancake/PancakeProblem.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Run1" type="PythonConfigurationType" factoryName="Python">
       <module name="CISC442PR1" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -187,6 +230,10 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Run1" />
+      <item itemvalue="Python.Pancake" />
+    </list>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -202,11 +249,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="555" y="23" width="885" height="877" extended-state="0" />
+    <frame x="720" y="23" width="720" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.501634" side_tool="true" visible="true" weight="0.21296297" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498366" visible="true" weight="0.21296297" />
+      <window_info id="Favorites" sideWeight="0.50079745" side_tool="true" visible="true" weight="0.26323318" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49920255" visible="true" weight="0.26323318" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -214,7 +261,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22038217" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.20127389" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -262,9 +309,6 @@
     <entry file="file://$PROJECT_DIR$/input_images/city2.jpg">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/input_images/im1_3.JPG">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/input_images/im1_2.JPG">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -278,10 +322,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/input_images/im1_3.JPG">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ITAI_HW1Pancake/PancakeProblem.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="59">
+          <caret line="18" column="17" lean-forward="true" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/core/multiarray.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="287">
+          <caret line="332" selection-start-line="332" selection-end-line="332" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="448" lean-forward="true" selection-start-line="448" selection-end-line="448" />
+        <state relative-caret-position="410">
+          <caret line="473" column="41" selection-start-line="473" selection-start-column="41" selection-end-line="473" selection-end-column="41" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
