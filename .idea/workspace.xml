@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-889">
-              <caret line="543" column="13" selection-start-line="543" selection-start-column="13" selection-end-line="543" selection-end-column="13" />
+            <state relative-caret-position="163">
+              <caret line="540" lean-forward="true" selection-start-line="540" selection-end-line="540" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -35,15 +35,6 @@
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/linalg/linalg.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="546" selection-start-line="546" selection-end-line="546" />
             </state>
           </provider>
         </entry>
@@ -141,8 +132,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="435" />
-    <option name="y" value="23" />
+    <option name="x" value="629" />
+    <option name="y" value="52" />
     <option name="width" value="742" />
     <option name="height" value="877" />
   </component>
@@ -249,11 +240,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="435" y="23" width="742" height="877" extended-state="0" />
+    <frame x="629" y="52" width="742" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.500998" side_tool="true" visible="true" weight="0.2552011" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.499002" visible="true" weight="0.2552011" />
+      <window_info id="Favorites" sideWeight="0.50091076" side_tool="true" visible="true" weight="0.2552011" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49908924" visible="true" weight="0.2552011" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -261,7 +252,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.36178344" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.30063695" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -315,25 +306,8 @@
     <entry file="file://$PROJECT_DIR$/input_images/city3.jpg">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/linalg/linalg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="546" selection-start-line="546" selection-end-line="546" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/input_images/im1_3.JPG">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ITAI_HW1Pancake/PancakeProblem.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="59">
-          <caret line="18" column="17" lean-forward="true" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/core/multiarray.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -349,10 +323,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/linalg/linalg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="546" selection-start-line="546" selection-end-line="546" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ITAI_HW1Pancake/PancakeProblem.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="59">
+          <caret line="18" column="17" lean-forward="true" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-889">
-          <caret line="543" column="13" selection-start-line="543" selection-start-column="13" selection-end-line="543" selection-end-column="13" />
+        <state relative-caret-position="163">
+          <caret line="540" lean-forward="true" selection-start-line="540" selection-end-line="540" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

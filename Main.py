@@ -223,20 +223,20 @@ def Convolve(I,H):
                 summedKernelRedValues = int(summedKernelRedValues/kernelTotal)
 
                 # Making sure summedColorValues are within [0,255]
-                if (summedKernelBlueValues >= 255):
-                    summedKernelBlueValues = 255
-                if (summedKernelBlueValues <= 0):
-                    summedKernelBlueValues = 0
-
-                if (summedKernelGreenValues >= 255):
-                    summedKernelGreenValues = 255
-                if (summedKernelGreenValues <= 0):
-                    summedKernelGreenValues = 0
-
-                if (summedKernelRedValues >= 255):
-                    summedKernelRedValues = 255
-                if (summedKernelRedValues <= 0):
-                    summedKernelRedValues = 0
+                # if (summedKernelBlueValues >= 255):
+                #     summedKernelBlueValues = 255
+                # if (summedKernelBlueValues <= 0):
+                #     summedKernelBlueValues = 0
+                #
+                # if (summedKernelGreenValues >= 255):
+                #     summedKernelGreenValues = 255
+                # if (summedKernelGreenValues <= 0):
+                #     summedKernelGreenValues = 0
+                #
+                # if (summedKernelRedValues >= 255):
+                #     summedKernelRedValues = 255
+                # if (summedKernelRedValues <= 0):
+                #     summedKernelRedValues = 0
 
                 newimage.itemset((row_index, column_index,0), summedKernelBlueValues)
                 newimage.itemset((row_index, column_index, 1), summedKernelGreenValues)
@@ -539,8 +539,6 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
     cropped_image  = cv2.bitwise_and(mask, foregroundImage_copy.copy())
 
 
-
-
     NLevels=1
 
     foregroundImage_copy=ScaleImage1ToImage2(foregroundImage_copy,backgroundImage_copy)
@@ -562,20 +560,20 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
         print("LEVEL:"+str(i))
         currentFore = np.float32(FORELAPLACIAN[i])
         print("CURRENT FORE:")
-        print(currentFore)
-        displayImageGivenArray(currentFore)
+        #print(currentFore)
+        #displayImageGivenArray(currentFore)
 
 
         currentBack = np.float32(BACKLAPLACIAN[i])
         print("CURRENT BACK:")
-        print(currentBack)
-        displayImageGivenArray(currentBack)
+        #print(currentBack)
+        #displayImageGivenArray(currentBack)
 
 
         currentMaskGaussian = np.float32(MASKGAUSSIAN[i])
         print("CURRENT MASK:")
 
-        print(currentMaskGaussian)
+        #print(currentMaskGaussian)
 
         print("WEIGHTS MASK GAUSSIAN")
         weightsMaskGaussian = currentMaskGaussian/255.0
@@ -587,27 +585,28 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
         np.set_printoptions(threshold=1000)
 
-        displayImageGivenArray(currentMaskGaussian)
+        #displayImageGivenArray(currentMaskGaussian)
 
 
         print("CURRENT BLENDED")
 
-        LeftHalfBlendedLaplacian = currentFore*(weightsMaskGaussian)
+        LeftHalfBlendedLaplacian = np.uint8(currentFore*(weightsMaskGaussian)*1)
         print("LEFT BLENDED:")
         np.set_printoptions(threshold=np.inf)
-        print(LeftHalfBlendedLaplacian)
-        displayImageGivenArray(LeftHalfBlendedLaplacian,'Left half')
+        #print(LeftHalfBlendedLaplacian)
+        #displayImageGivenArray(LeftHalfBlendedLaplacian,'Left half')
 
 
-        RightHalfBlendedLaplacian = currentBack*(invertedWeightsMaskGaussian)
+        RightHalfBlendedLaplacian = np.uint8(currentBack*(invertedWeightsMaskGaussian)*1)
         print("RIGHT BLENDED:")
-        print(RightHalfBlendedLaplacian)
-        displayImageGivenArray(RightHalfBlendedLaplacian,'Right Half')
-        currentBlendedLaplacian = ((cv2.add(LeftHalfBlendedLaplacian,RightHalfBlendedLaplacian)))/255
+        #print(RightHalfBlendedLaplacian)
+        #displayImageGivenArray(RightHalfBlendedLaplacian,'Right Half')
+        currentBlendedLaplacian = (LeftHalfBlendedLaplacian+RightHalfBlendedLaplacian)
+
 
         print("CURRENT BLENDED:")
         print(currentBlendedLaplacian)
-        displayImageGivenArray(currentBlendedLaplacian,"Current Blended:")
+        #displayImageGivenArray(currentBlendedLaplacian,"Current Blended:")
 
 
 
