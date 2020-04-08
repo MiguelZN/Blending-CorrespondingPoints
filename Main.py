@@ -531,7 +531,13 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
     mask.fill(0)
     print(mask)
 
+    cv2.polylines(mask, np.array([circles]),True, [255,255,255],1)
+    outlinepoints = np.where(np.all(mask == [255,255,255], axis=-1))
+    outlinepoints = zip(outlinepoints[0],outlinepoints[1])
+
+    print(outlinepoints)
     cv2.fillPoly(mask, np.array([circles]), [255,255,255])
+
     print("Mask:")
     displayImageGivenArray(mask,windowTitle='Mask')
 
@@ -590,18 +596,31 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
         print("CURRENT BLENDED")
 
-        LeftHalfBlendedLaplacian = np.uint8(currentFore*(weightsMaskGaussian)*1)
+        LeftHalfBlendedLaplacian = np.uint8(currentFore*(weightsMaskGaussian))
         print("LEFT BLENDED:")
         np.set_printoptions(threshold=np.inf)
         #print(LeftHalfBlendedLaplacian)
         #displayImageGivenArray(LeftHalfBlendedLaplacian,'Left half')
 
 
-        RightHalfBlendedLaplacian = np.uint8(currentBack*(invertedWeightsMaskGaussian)*1)
+        RightHalfBlendedLaplacian = np.uint8(currentBack*(invertedWeightsMaskGaussian))
         print("RIGHT BLENDED:")
         #print(RightHalfBlendedLaplacian)
         #displayImageGivenArray(RightHalfBlendedLaplacian,'Right Half')
-        currentBlendedLaplacian = (LeftHalfBlendedLaplacian+RightHalfBlendedLaplacian)
+        currentBlendedLaplacian = np.uint8(LeftHalfBlendedLaplacian+RightHalfBlendedLaplacian)
+
+        # for point in outlinepoints:
+        #     print("Averaging the outline!")
+        #     print(point)
+        #     print(currentBlendedLaplacian[51][126])
+        #     print(currentBlendedLaplacian.shape)
+        #     currentBlendedPoint = currentBlendedLaplacian[point[0]][point[1]]
+        #     currentBlue = currentBlendedPoint[0]
+        #     currentGreen = currentBlendedPoint[1]
+        #     currentRed = currentBlendedPoint[2]
+        #
+        #     newBlendedPoint = [currentBlue/2,currentGreen/2,currentRed/2]
+        #     currentBlendedLaplacian[point[0]][point[1]] = newBlendedPoint
 
 
         print("CURRENT BLENDED:")
@@ -613,10 +632,11 @@ def cropAndMaskGivenImages(foregroundImagePath,backgroundImagePath, wantGrayImag
 
         BLENDEDLAPLACIAN = [currentBlendedLaplacian]+BLENDEDLAPLACIAN
 
-    #BLENDEDLAPLACIAN[NLevels-1] = FORELAPLACIAN[NLevels-1]
 
     combinedimage = Reconstruct(np.array(BLENDEDLAPLACIAN), NLevels)
-    #Reconstruct(FORELAPLACIAN,NLevels)
+
+    # for point in outlinepoints:
+    #     combinedimage[point[0]][point[1]] = [0,0,255]
 
     cv2.imshow("Combined image:",combinedimage)
     cv2.waitKey(0)
@@ -893,7 +913,7 @@ def main():
 
     #Reconstruct(LaplacianPyramids(getImageArray(listOfImages[7],False),10,displayBothLaplacianAndGaussian=True))
     #Reconstruct(LaplacianPyramids(image_copy,5,True))
-    cropAndMaskGivenImages(listOfImages[3],listOfImages[4],wantGrayImage)
+    cropAndMaskGivenImages(listOfImages[4],listOfImages[3],wantGrayImage)
 
 
 

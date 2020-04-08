@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/Main.py" line="636" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="534ff38a-2df2-4d3c-ae23-dbeaaa1fef2b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
@@ -18,8 +21,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="540" lean-forward="true" selection-start-line="540" selection-end-line="540" />
+            <state relative-caret-position="269">
+              <caret line="606" column="31" lean-forward="true" selection-start-line="606" selection-start-column="31" selection-end-line="606" selection-end-column="31" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -113,6 +116,7 @@
       <find>image2</find>
       <find>gaussian</find>
       <find>CURRENT LAPLACIAN IMAGE</find>
+      <find>outlinepoints</find>
     </findStrings>
     <replaceStrings>
       <replace>imageOnePoints_matrix</replace>
@@ -132,9 +136,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="629" />
-    <option name="y" value="52" />
-    <option name="width" value="742" />
+    <option name="x" value="720" />
+    <option name="y" value="23" />
+    <option name="width" value="720" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -240,11 +244,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="629" y="52" width="742" height="877" extended-state="0" />
+    <frame x="720" y="23" width="720" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.50091076" side_tool="true" visible="true" weight="0.2552011" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49908924" visible="true" weight="0.2552011" />
+      <window_info id="Favorites" sideWeight="0.50091076" side_tool="true" visible="true" weight="0.26323318" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49908924" visible="true" weight="0.26323318" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -342,8 +346,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="540" lean-forward="true" selection-start-line="540" selection-end-line="540" />
+        <state relative-caret-position="269">
+          <caret line="606" column="31" lean-forward="true" selection-start-line="606" selection-start-column="31" selection-end-line="606" selection-end-column="31" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
