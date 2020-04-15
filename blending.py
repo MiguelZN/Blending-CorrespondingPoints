@@ -735,17 +735,17 @@ def main():
 
     #Allows user to manually pick their two images
     curr_directory = os.getcwd()
-    #image1path = browseImagesDialog(MessageForUser='Select your image1 (Foreground)')
-    #image2path = browseImagesDialog(MessageForUser='Select your image2 (Background)')
+    image1path = browseImagesDialog(MessageForUser='Select your image1 (Foreground)')
+    image2path = browseImagesDialog(MessageForUser='Select your image2 (Background)')
 
 
     #Gets a list of imagepaths (Strings) to all images contained within ./input_images folder:
     listOfImages = getAllImagesFromInputImagesDir(IMAGEDIR,True)
-    LaplacianPyramids(getImageArray(listOfImages[4],False),4,True)
+    #LaplacianPyramids(getImageArray(listOfImages[4],False),4,True)
 
     #If wantGrayImage is false gets a colored image, otherwise gets a gray image
     wantGrayImage = False
-    #cropAndMaskGivenImages(image1path,image2path,wantGrayImage, NLevels=3)
+    cropAndMaskGivenImages(image1path,image2path,wantGrayImage, NLevels=3)
 
 
 main()
