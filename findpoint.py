@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 import os
+from cpselect.cpselect import cpselect
 
 IMAGEDIR = './input_images/'
 
@@ -176,11 +177,14 @@ selectedPoints = morethanthreeimage1image2points
 # print(selectedPoints)
 
 # (Uncomment below to get points manually using cpselect)
-# selectedPoints = cpselect(mountainimage1,mountainimage2)
+selectedPoints = cpselect(mountainimage1,mountainimage2)
 
 # Test point (verified to be about the same feature in image 1,2)
 point4_image1 = [morethanthreeimage1image2points[4]['img1_x'], morethanthreeimage1image2points[4]['img1_y']]
 point4_image2 = [morethanthreeimage1image2points[4]['img2_x'], morethanthreeimage1image2points[4]['img2_y']]
+
+findCorrespondingImage2Point(point4_image1, selectedPoints)
+print("Selected:" + str(point4_image2) + '\n')
 
 findCorrespondingImage2Point(point4_image1, morethanthreeimage1image2points)
 print("Actual:" + str(point4_image2) + '\n')
@@ -189,8 +193,8 @@ print("Inverse:")
 findCorrespondingImage2Point(point4_image2, inverse_morethanthreeimage1image2points)
 print("Actual:" + str(point4_image1) + '\n')
 
-# findCorrespondingImage2Point((366.06,107.67), selectedPoints)
-# print("Actual:216.06, 135.56"+ '\n')
+findCorrespondingImage2Point((366.06,107.67), selectedPoints)
+print("Actual:216.06, 135.56"+ '\n')
 # #cpselect(mountainimage1, mountainimage2)
 # #366.06,107.67  216.06, 135.56
 #

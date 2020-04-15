@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="534ff38a-2df2-4d3c-ae23-dbeaaa1fef2b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/findpoint.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/blending.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,32 +17,7 @@
     <favorites_list name="CISC442PR1" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/blending.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="751" lean-forward="true" selection-start-line="751" selection-end-line="751" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/findpoint.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" selection-start-line="5" selection-end-line="12" selection-end-column="3" />
-              <folding>
-                <element signature="e#89#107#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -106,9 +79,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-35" />
-    <option name="y" value="94" />
-    <option name="width" value="742" />
+    <option name="x" value="720" />
+    <option name="y" value="23" />
+    <option name="width" value="720" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -118,17 +91,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="CISC442PR1" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CISC442PR1" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -239,10 +202,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-35" y="94" width="742" height="877" extended-state="0" />
+    <frame x="720" y="23" width="720" height="877" extended-state="0" />
     <layout>
-      <window_info id="Favorites" sideWeight="0.500998" side_tool="true" visible="true" weight="0.27045768" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.499002" visible="true" weight="0.27045768" />
+      <window_info id="Favorites" sideWeight="0.50063694" side_tool="true" visible="true" weight="0.27896994" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49936306" visible="true" weight="0.27896994" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -250,7 +213,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.36178344" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.36178344" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -362,22 +325,22 @@
     <entry file="file://$PROJECT_DIR$/input_images/im1_1.JPG">
       <provider selected="true" editor-type-id="images" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/blending.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="686">
+          <caret line="751" lean-forward="true" selection-start-line="751" selection-end-line="751" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/findpoint.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" selection-start-line="5" selection-end-line="12" selection-end-column="3" />
           <folding>
             <element signature="e#89#107#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/blending.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="751" lean-forward="true" selection-start-line="751" selection-end-line="751" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
